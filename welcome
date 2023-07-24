@@ -16,6 +16,30 @@ translations_dir=$EOS_SCRIPTS_DIR                 # used also by the translation
 
 source $translations_dir/translations.bash
 
+# button icons, see
+#   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s04.html
+#   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s02.html
+
+ICO_NEWS=help-browser
+ICO_CHANGES=document-new
+ICO_HELP=help-contents
+ICO_BOOKMARK=user-bookmarks
+ICO_SAD=application-exit  # face-sad
+ICO_ANGEL=face-angel
+ICO_PREFERENCES_DISPLAY=preferences-desktop-personal # preferences-system
+ICO_MIRROR_RANK=system-search
+ICO_INSTALL=system-software-install
+ICO_INFO_WEB=dialog-information
+ICO_GPARTED=drive-harddisk
+ICO_CUSTOM=preferences-desktop-personal
+ICO_UPDATE=system-software-update
+ICO_SYSTOOLS=applications-utilities
+ICO_WALL=preferences-desktop-wallpaper
+ICO_WALL_DOWNLOAD=emblem-downloads
+ICO_LOG=dialog-information
+ICO_THEME=preferences-desktop-theme
+ICO_EXIT=application-exit
+ICO_ENABLE=system-run
 
 #################################################################################
 EOS_SCRIPTS_YAD=$EOS_SCRIPTS_DIR/eos-script-lib-yad
@@ -236,7 +260,7 @@ ShowChangeResoButton() {
     fi
 
     if [ "$show_reso_butt" = "yes" ] ; then
-        tabcontents+=(--field=" $(ltr ins_reso)!!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
+        tabcontents+=(--field=" $(ltr ins_reso)!$ICO_PREFERENCES_DISPLAY!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
     fi
 }
 export -f ShowChangeResoButton
@@ -252,18 +276,18 @@ MirrorRankingButtons() {
     if [ "$(eos_GetArch)" != "armv7h" ] ; then
         if [ -x /usr/bin/reflector-simple ] ; then
             tabcontents+=(
-                --field=" $(ltr after_install_um) (Arch, reflector-simple)!!$(ltr after_install_umtip)":fbtn "reflector-simple"
+                --field=" $(ltr after_install_um) (Arch, reflector-simple)!$ICO_MIRROR_RANK!$(ltr after_install_umtip)":fbtn "reflector-simple"
             )
         fi
         if [ -x /usr/bin/rate-mirrors ] ; then
             tabcontents+=(
-                --field=" $(ltr after_install_um) (Arch, rate-mirrors)!!$(ltr after_install_umtip)":fbtn "RateMirrors"
+                --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umtip)":fbtn "RateMirrors"
             )
         fi
     fi
     if [ -x /usr/bin/eos-rankmirrors ] ; then
         tabcontents+=(
-            --field=" $(ltr after_install_um) (EndeavourOS)!!$(ltr after_install_umtip)":fbtn "RunInTerminal eos-rankmirrors"
+            --field=" $(ltr after_install_um) (EndeavourOS)!$ICO_MIRROR_RANK!$(ltr after_install_umtip)":fbtn "RunInTerminal eos-rankmirrors"
         )
     fi
 }
@@ -292,13 +316,13 @@ INSTALL() {
       --text="$text"
       --text-align=left
 
-      --field=" $(ltr ins_start)!!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
-      --field=" $(ltr install_community)!!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
-      --field=" EndeavourOS ARM Image Installer!!Start installing EndeavourOS ARM edition":fbtn    "arm-eos-welcome-installer"
+      --field=" $(ltr ins_start)!$ICO_INSTALL!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
+      --field=" $(ltr install_community)!$ICO_INSTALL!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
+      --field=" EndeavourOS ARM Image Installer!$ICO_INSTALL!Start installing EndeavourOS ARM edition":fbtn    "arm-eos-welcome-installer"
   )
   if [ "$has_a_connection" = "yes" ] ; then
       tabcontents+=(
-          --field=" $(ltr ins_custom)!!$(ltr ins_custom_tip)":fbtn "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
+          --field=" $(ltr ins_custom)!$ICO_INFO_WEB!$(ltr ins_custom_tip)":fbtn "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
       )
       MirrorRankingButtons
   fi
@@ -306,15 +330,15 @@ INSTALL() {
   ShowChangeResoButton
 
   tabcontents+=(
-      --field=" $(ltr ins_pm)!!$(ltr ins_pmtip)":fbtn                  'gparted'
+      --field=" $(ltr ins_pm)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn                  'gparted'
   )
   if [ "$has_a_connection" = "yes" ] ; then
       tabcontents+=(
-          --field=" $(ltr ins_blue_notes)!!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
-          --field=" $(ltr ins_rel)!!$(ltr ins_reltip)":fbtn                   "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
-          --field=" $(ltr ins_tips)!!$(ltr ins_tipstip)":fbtn              "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
-          --field=" $(ltr ins_syslog)!!$(ltr ins_syslogtip)":fbtn          "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
-          --field=" $(ltr ins_customized)!!$(ltr ins_cust_text)":fbtn      "AskUserCustomUrl"
+          --field=" $(ltr ins_blue_notes)!$ICO_INFO_WEB!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
+          --field=" $(ltr ins_rel)!$ICO_INFO_WEB!$(ltr ins_reltip)":fbtn                   "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
+          --field=" $(ltr ins_tips)!$ICO_INFO_WEB!$(ltr ins_tipstip)":fbtn              "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
+          --field=" $(ltr ins_syslog)!$ICO_INFO_WEB!$(ltr ins_syslogtip)":fbtn          "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+          --field=" $(ltr ins_customized)!$ICO_CUSTOM!$(ltr ins_cust_text)":fbtn      "AskUserCustomUrl"
       )
   fi
 
@@ -350,12 +374,12 @@ GeneralInfo() {
       --image=$WELCOME_ICON_QUESTION
       --text="$text"
       --text-align=left
-      --field=" $(ltr general_info_ws)!!https://endeavouros.com":fbtn          "WelcomeBrowser https://endeavouros.com"
-      --field=" $(ltr general_info_wi)!!$(ltr general_info_witip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com"
-      --field=" $(ltr general_info_ne)!!$(ltr general_info_netip)":fbtn        "WelcomeBrowser https://endeavouros.com/news"
-      --field=" $(ltr general_info_fo)!!$(ltr general_info_fotip)":fbtn        "WelcomeBrowser https://forum.endeavouros.com"
-      --field=" $(ltr general_info_do)!!$(ltr general_info_dotip)":fbtn        "WelcomeBrowser https://endeavouros.com/donate"
-      --field=" $(ltr general_info_ab)!!$(ltr general_info_abtip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com/endeavouros-tools/welcome"
+      --field=" $(ltr general_info_ws)!$ICO_INFO_WEB!https://endeavouros.com":fbtn          "WelcomeBrowser https://endeavouros.com"
+      --field=" $(ltr general_info_wi)!$ICO_INFO_WEB!$(ltr general_info_witip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com"
+      --field=" $(ltr general_info_ne)!$ICO_INFO_WEB!$(ltr general_info_netip)":fbtn        "WelcomeBrowser https://endeavouros.com/news"
+      --field=" $(ltr general_info_fo)!$ICO_INFO_WEB!$(ltr general_info_fotip)":fbtn        "WelcomeBrowser https://forum.endeavouros.com"
+      --field=" $(ltr general_info_do)!$ICO_INFO_WEB!$(ltr general_info_dotip)":fbtn        "WelcomeBrowser https://endeavouros.com/donate"
+      --field=" $(ltr general_info_ab)!$ICO_INFO_WEB!$(ltr general_info_abtip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com/endeavouros-tools/welcome"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -423,13 +447,13 @@ AddEosAurHelpers() {
         if [ -x /usr/bin/$helper ] ; then
             [ -z "$h2" ] && h2="$helper"
             tabcontents+=(
-                --field=" $(ltr after_install_us) ($helper)!!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper $helper"
+                --field=" $(ltr after_install_us) ($helper)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper $helper"
             )
         fi
     done
     helper="$h2"
     tabcontents+=(
-        --field=" $(ltr after_install_us) (eos-update --$helper)!!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper 'eos-update --$helper'"
+        --field=" $(ltr after_install_us) (eos-update --$helper)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper 'eos-update --$helper'"
     )
 }
 export -f AddEosAurHelpers
@@ -454,38 +478,38 @@ AfterInstall() {
   MirrorRankingButtons
   AddEosAurHelpers
   tabcontents+=(
-      #--field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"     # "RunInTerminal UpdateInTerminal --lang=$lang"
-      --field=" $(ltr after_install_pclean)!!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
+      #--field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"     # "RunInTerminal UpdateInTerminal --lang=$lang"
+      --field=" $(ltr after_install_pclean)!$ICO_SYSTOOLS!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
 
   if [ -x /usr/bin/eos-update-notifier-configure ] ; then
-      tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
+      tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!$ICO_UPDATE!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
   fi
 
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
-      tabcontents+=(--field=" $(ltr after_install_cdm)!!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
+      tabcontents+=(--field=" $(ltr after_install_cdm)!$ICO_SYSTOOLS!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
   fi
 
   ShowChangeResoButton
 
   tabcontents+=(
-      --field=" $(ltr after_install_ew)!!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
-      --field=" $(ltr after_install_ew2)!!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
-      --field=" $(ltr after_install_more_wall)!!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
+      --field=" $(ltr after_install_ew)!$ICO_WALL!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
+      --field=" $(ltr after_install_ew2)!$ICO_WALL!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
+      --field=" $(ltr after_install_more_wall)!$ICO_WALL_DOWNLOAD!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
   )
   if IsR8168Card ; then
       tabcontents+=(
-          --field=" $(ltr after_install_r8168)!!$(ltr after_install_r8168_tip)":fbtn "ethernet_toggle_r8168_r8169"
+          --field=" $(ltr after_install_r8168)!$ICO_SYSTOOLS!$(ltr after_install_r8168_tip)":fbtn "ethernet_toggle_r8168_r8169"
       )
   fi
-  tabcontents+=(--field=" $(ltr ins_logtool)!!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+  tabcontents+=(--field=" $(ltr ins_logtool)!$ICO_LOG!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
   VboxGuestEnable
 
   case "$CurrentDesktop" in
       xfce) AddXfceThemingButtons ;;
   esac
 
-  tabcontents+=(--field=" $(ltr after_install_itab)!!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
+  tabcontents+=(--field=" $(ltr after_install_itab)!$ICO_PREFERENCES_DISPLAY!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
@@ -526,8 +550,8 @@ AddXfceThemingButtons() {
     }
     export -f XfceTheming
     tabcontents+=(
-        --field=" $(ltr after_install_themevan)!!$(ltr after_install_themevantip)":fbtn "XfceTheming vanilla"
-        --field=" $(ltr after_install_themedef)!!$(ltr after_install_themedeftip)":fbtn "XfceTheming EOS"
+        --field=" $(ltr after_install_themevan)!$ICO_THEME!$(ltr after_install_themevantip)":fbtn "XfceTheming vanilla"
+        --field=" $(ltr after_install_themedef)!$ICO_THEME!$(ltr after_install_themedeftip)":fbtn "XfceTheming EOS"
     )
 }
 
@@ -566,35 +590,35 @@ DailyAssistant() {
       eos_yad --align-buttons --use-interp  # don't need explicit 'bash -c' construct when calling functions
       --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
       --text="$text" --columns=2
-      # --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"    # "RunInTerminal UpdateInTerminal --lang=$lang"
-      # --field=" $(ltr after_install_us) (UpdateInTerminal)!!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      # --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"    # "RunInTerminal UpdateInTerminal --lang=$lang"
+      # --field=" $(ltr after_install_us) (UpdateInTerminal)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
   )
   AddEosAurHelpers
   MirrorRankingButtons
-  tabcontents+=(--field=" Pacdiff $_and $differ!!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
+  tabcontents+=(--field=" Pacdiff $_and $differ!$ICO_SYSTOOLS!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
-      --field=" $(ltr ins_logtool)!!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
-      --field=" $(ltr daily_assist_anews)!!$(ltr daily_assist_anewstip)":fbtn "WelcomeBrowser https://archlinux.org/news"
+      --field=" $(ltr ins_logtool)!$ICO_LOG!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
+      --field=" $(ltr daily_assist_anews)!$ICO_NEWS!$(ltr daily_assist_anewstip)":fbtn "WelcomeBrowser https://archlinux.org/news"
   )
 
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
       tabcontents+=(
-          --field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinuxarm.org/packages"
+          --field=" $(ltr add_more_apps_arch)!$ICO_INFO_WEB!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinuxarm.org/packages"
       )
   else
       tabcontents+=(
-          --field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinux.org/packages"
+          --field=" $(ltr add_more_apps_arch)!$ICO_INFO_WEB!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinux.org/packages"
       )
   fi
   tabcontents+=(
-      --field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "WelcomeBrowser https://aur.archlinux.org/packages"
-      --field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "WelcomeBrowser https://wiki.archlinux.org/title/List_of_applications"
+      --field=" $(ltr add_more_apps_aur)!$ICO_INFO_WEB!$( ltr add_more_apps_done2_tip2)":fbtn "WelcomeBrowser https://aur.archlinux.org/packages"
+      --field=" $(ltr daily_assist_apps)!$ICO_INFO_WEB!$(ltr daily_assist_apps_tip)":fbtn "WelcomeBrowser https://wiki.archlinux.org/title/List_of_applications"
   )
 
   if [ -n "$CurrentDesktop" ] ; then
       tabcontents+=(
-          --field=" $CurrentDesktop: $(ltr daily_assist_DEinfo)!!$CurrentDesktop: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$CurrentDesktop"
+          --field=" $CurrentDesktop: $(ltr daily_assist_DEinfo)!$ICO_INFO_WEB!$CurrentDesktop: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$CurrentDesktop"
       )
   fi
 
@@ -623,7 +647,7 @@ WelcomeInitialTab() {
     local cmd=(
         eos_yad --form --align-buttons --use-interp --title="Welcome initial tab"
         --text="$txt" --image=$WELCOME_ICON_PREFERENCES
-        --field="Initial tab number\t\t":num "$EOS_WELCOME_ACTIVE_TAB_NUMBER!!1"
+        --field="Initial tab number\t\t":num "$EOS_WELCOME_ACTIVE_TAB_NUMBER!$ICO_PREFERENCES_DISPLAY!1"
     )
     local result="$("${cmd[@]}" | cut -d '|' -f1)"
     [ -z "$result" ] && return
@@ -661,22 +685,22 @@ UsefulTips() {
       --image=$WELCOME_ICON_TIPS
       --text="$text"
 
-      --field=" $(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/?s=pacman'"
-      --field=" $(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/category/aur'"
+      --field=" $(ltr after_install_pm)!$ICO_INFO_WEB!$(ltr after_install_pmtip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/?s=pacman'"
+      --field=" $(ltr after_install_ay)!$ICO_INFO_WEB!$(ltr after_install_aytip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/category/aur'"
   )
   if [ -x /usr/bin/firewalld ] ; then
-      tabcontents+=(--field=" $(ltr after_install_fw)!!$(ltr after_install_fwtip)":fbtn "WelcomeBrowser   'https://discovery.endeavouros.com/applications/firewalld/2022/03'")
+      tabcontents+=(--field=" $(ltr after_install_fw)!$ICO_INFO_WEB!$(ltr after_install_fwtip)":fbtn "WelcomeBrowser   'https://discovery.endeavouros.com/applications/firewalld/2022/03'")
   fi
   tabcontents+=(
-      --field=" $(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/?s=Hardware'"
-      --field=" $(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03'"  # 'https://discovery.endeavouros.com/bluetooth'
+      --field=" $(ltr after_install_hn)!$ICO_INFO_WEB!$(ltr after_install_hntip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/?s=Hardware'"
+      --field=" $(ltr after_install_bt)!$ICO_INFO_WEB!$(ltr after_install_bttip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03'"  # 'https://discovery.endeavouros.com/bluetooth'
   )
-  test "$(eos_GetArch)" != "armv7h" && tabcontents+=(--field=" $(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn "WelcomeBrowser https://discovery.endeavouros.com/category/nvidia")
+  test "$(eos_GetArch)" != "armv7h" && tabcontents+=(--field=" $(ltr after_install_nv)!$ICO_INFO_WEB!$(ltr after_install_nvtip)":fbtn "WelcomeBrowser https://discovery.endeavouros.com/category/nvidia")
   tabcontents+=(
-      --field=" $(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn     "WelcomeBrowser https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
-      --field=" EndeavourOS $_and ARM!!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "WelcomeBrowser https://arm.endeavouros.com"
-      --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn      "WelcomeBrowser $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
-      --field=" $(ltr butt_owncmds_dnd)!!$(ltr butt_owncmds_dnd_help)":fbtn   "welcome-dnd"
+      --field=" $(ltr after_install_ft)!$ICO_INFO_WEB!$(ltr after_install_fttip)":fbtn     "WelcomeBrowser https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+      --field=" EndeavourOS $_and ARM!$ICO_INFO_WEB!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "WelcomeBrowser https://arm.endeavouros.com"
+      --field=" $(ltr butt_owncmds_help)!$ICO_INFO_WEB!$(ltr nb_tab_owncmdstip)":fbtn      "WelcomeBrowser $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
+      --field=" $(ltr butt_owncmds_dnd)!$ICO_SYSTOOLS!$(ltr butt_owncmds_dnd_help)":fbtn   "welcome-dnd"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -695,16 +719,16 @@ AddMoreApps() {
   local shown_app_buttons=0
 
   ((shown_app_buttons++))
-  tabcontents+=(--field=" $(ltr add_more_apps_qs)!!$(ltr add_more_apps_qstip)":fbtn "eos-quickstart")
+  tabcontents+=(--field=" $(ltr add_more_apps_qs)!$ICO_SYSTOOLS!$(ltr add_more_apps_qstip)":fbtn "eos-quickstart")
 
-  tabcontents+=(--field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "WelcomeBrowser https://wiki.archlinux.org/title/List_of_applications")
-  tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "WelcomeBrowser https://aur.archlinux.org/packages")
+  tabcontents+=(--field=" $(ltr daily_assist_apps)!$ICO_INFO_WEB!$(ltr daily_assist_apps_tip)":fbtn "WelcomeBrowser https://wiki.archlinux.org/title/List_of_applications")
+  tabcontents+=(--field=" $(ltr add_more_apps_aur)!$ICO_INFO_WEB!$( ltr add_more_apps_done2_tip2)":fbtn "WelcomeBrowser https://aur.archlinux.org/packages")
 
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
-      tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinuxarm.org/packages")
+      tabcontents+=(--field=" $(ltr add_more_apps_arch)!$ICO_INFO_WEB!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinuxarm.org/packages")
   else
-      tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinux.org/packages")
+      tabcontents+=(--field=" $(ltr add_more_apps_arch)!$ICO_INFO_WEB!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinux.org/packages")
   fi
 
   # Now we know if we have any apps in the install list.
@@ -733,7 +757,7 @@ personal_commands_add() {   # add one personal command
     [ -n "$cmd" ] || cmd="$(echo "$commandline" | /usr/bin/awk '{print $1}')"
 
     if (/usr/bin/which $cmd &> /dev/null) ; then
-        welcome_own_commands+=(--field=" $name!!$description":fbtn "$commandline")
+        welcome_own_commands+=(--field=" $name!$ICO_CUSTOM!$description":fbtn "$commandline")
     else
         printf "%s: %s\n    %s\n" "$(/usr/bin/date "+%x %X")" "$FUNCNAME:" "warning: command '$cmd' not found" >> /tmp/welcome-personal-commands.log
         echo "$FUNCNAME: warning: command '$cmd' not found" >&2
@@ -799,9 +823,9 @@ OwnCommands() {
   )
   if [ "$show_buttons" = "yes" ] ; then
       tabcontents+=(
-          --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn
+          --field=" $(ltr butt_owncmds_help)!$ICO_INFO_WEB!$(ltr nb_tab_owncmdstip)":fbtn
                   "WelcomeBrowser $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
-          --field=" $(ltr butt_owncmds_dnd)!!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
+          --field=" $(ltr butt_owncmds_dnd)!$ICO_CUSTOM!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
       )
   fi
   tabcontents+=("${welcome_own_commands[@]}")
@@ -945,7 +969,7 @@ EOF
         disable)
             eos_yad --form --image=$WELCOME_ICON_INFO --text="$(ltr settings_dis_contents)" \
                     --title="$(ltr settings_dis_title)" \
-                    --button=" $(ltr settings_dis_butt)!!$(ltr settings_dis_buttip)":11
+                    --button=" $(ltr settings_dis_butt)!$ICO_EXIT!$(ltr settings_dis_buttip)":11
             ;;
         check)
             grep "^Greeter=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2
@@ -1146,7 +1170,7 @@ VboxGuestEnable() {
                 local msgvb="$msg1\n<b>$label</b>"
                 local icon=$WELCOME_ICON_TIPS
                 eos_yad --form --title="Info" --text="$msgvb" --image=$WELCOME_ICON_TIPS --button=yad-quit:0 &
-                tabcontents+=(--field=" $label!!$cmd":fbtn "RunInTerminal $cmd")
+                tabcontents+=(--field=" $label!$ICO_ENABLE!$cmd":fbtn "RunInTerminal $cmd")
             fi
             ;;
     esac
@@ -1525,25 +1549,25 @@ StartHere() {
     notebook+=(--active-tab=$active_tab_nr)
 
     if [ "$has_a_connection" = "yes" ] ; then
-        notebook+=(--button=" $(ltr butt_softnews)!!$(ltr butt_softnews_tip)":"ImportantNews")
-        notebook+=(--button=" $(ltr butt_changelog)!!$(ltr butt_changelogtip)":"WelcomeChangelog")
+        notebook+=(--button=" $(ltr butt_softnews)!$ICO_NEWS!$(ltr butt_softnews_tip)":"ImportantNews")
+        notebook+=(--button=" $(ltr butt_changelog)!$ICO_CHANGES!$(ltr butt_changelogtip)":"WelcomeChangelog")
     fi
     case "$EOS_WELCOME_HAS_SEE_YOU_LATER_BUTTON" in
         yes)
             if [ "$has_a_connection" = "yes" ] ; then
-                notebook+=(--button=" $(ltr butt_help)!!":"WelcomeHelp")
+                notebook+=(--button=" $(ltr butt_help)!$ICO_HELP!":"WelcomeHelp")
             fi
             if [ "$is_installing" = "no" ] ; then
-                notebook+=(--button=" $(ltr butt_noshow)!!$(ltr butt_noshow)":5)
+                notebook+=(--button=" $(ltr butt_noshow)!$ICO_SAD!$(ltr butt_noshow)":5)
             fi
-            notebook+=(--button=" $(ltr butt_later)!!$(ltr butt_latertip)":0)
+            notebook+=(--button=" $(ltr butt_later)!$ICO_ANGEL!$(ltr butt_latertip)":0)
             ;;
         no|*)
             if [ "$has_a_connection" = "yes" ] ; then
                 if [ "$is_installing" = "no" ] ; then
-                    notebook+=(--button=" $(ltr butt_noshow)!!$(ltr butt_noshow)":5)
+                    notebook+=(--button=" $(ltr butt_noshow)!$ICO_SAD!$(ltr butt_noshow)":5)
                 fi
-                notebook+=(--button=" $(ltr butt_help)!!":"WelcomeHelp")
+                notebook+=(--button=" $(ltr butt_help)!$ICO_HELP!":"WelcomeHelp")
             else
                 notebook+=(--button=yad-quit:1)
             fi
