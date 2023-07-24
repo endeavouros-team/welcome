@@ -16,30 +16,6 @@ translations_dir=$EOS_SCRIPTS_DIR                 # used also by the translation
 
 source $translations_dir/translations.bash
 
-# button icons, see
-#   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s04.html
-#   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s02.html
-
-ICO_NEWS=help-browser
-ICO_CHANGES=document-new
-ICO_HELP=help-contents
-ICO_BOOKMARK=user-bookmarks
-ICO_SAD=application-exit  # face-sad
-ICO_ANGEL=face-angel
-ICO_PREFERENCES_DISPLAY=preferences-desktop-personal # preferences-system
-ICO_MIRROR_RANK=system-search
-ICO_INSTALL=system-software-install
-ICO_INFO_WEB=dialog-information
-ICO_GPARTED=drive-harddisk
-ICO_CUSTOM=preferences-desktop-personal
-ICO_UPDATE=system-software-update
-ICO_SYSTOOLS=applications-utilities
-ICO_WALL=preferences-desktop-wallpaper
-ICO_WALL_DOWNLOAD=emblem-downloads
-ICO_LOG=dialog-information
-ICO_THEME=preferences-desktop-theme
-ICO_EXIT=application-exit
-ICO_ENABLE=system-run
 
 #################################################################################
 EOS_SCRIPTS_YAD=$EOS_SCRIPTS_DIR/eos-script-lib-yad
@@ -312,7 +288,7 @@ INSTALL() {
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
-      --image=$WELCOME_ICON_INSTALL_OFFICIAL                       # $WELCOME_ICON_INSTALL_TAB
+      --image=$ICO_CALAMARES                       # $WELCOME_ICON_INSTALL_TAB
       --text="$text"
       --text-align=left
 
@@ -321,23 +297,20 @@ INSTALL() {
       --field=" EndeavourOS ARM Image Installer!$ICO_INSTALL!Start installing EndeavourOS ARM edition":fbtn    "arm-eos-welcome-installer"
   )
   if [ "$has_a_connection" = "yes" ] ; then
-      tabcontents+=(
-          --field=" $(ltr ins_custom)!$ICO_INFO_WEB!$(ltr ins_custom_tip)":fbtn "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
-      )
       MirrorRankingButtons
   fi
-
-  ShowChangeResoButton
 
   tabcontents+=(
       --field=" $(ltr ins_pm)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn                  'gparted'
   )
+  ShowChangeResoButton
   if [ "$has_a_connection" = "yes" ] ; then
       tabcontents+=(
-          --field=" $(ltr ins_blue_notes)!$ICO_INFO_WEB!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
-          --field=" $(ltr ins_rel)!$ICO_INFO_WEB!$(ltr ins_reltip)":fbtn                   "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
-          --field=" $(ltr ins_tips)!$ICO_INFO_WEB!$(ltr ins_tipstip)":fbtn              "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
-          --field=" $(ltr ins_syslog)!$ICO_INFO_WEB!$(ltr ins_syslogtip)":fbtn          "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+          --field=" $(ltr ins_blue_notes)!$ICO_TIPS!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
+          --field=" $(ltr ins_rel)!$ICO_TIPS!$(ltr ins_reltip)":fbtn                   "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
+          --field=" $(ltr ins_tips)!$ICO_TIPS!$(ltr ins_tipstip)":fbtn              "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
+          --field=" $(ltr ins_syslog)!$ICO_TIPS!$(ltr ins_syslogtip)":fbtn          "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+          --field=" $(ltr ins_custom)!$ICO_TIPS!$(ltr ins_custom_tip)":fbtn "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
           --field=" $(ltr ins_customized)!$ICO_CUSTOM!$(ltr ins_cust_text)":fbtn      "AskUserCustomUrl"
       )
   fi
@@ -351,7 +324,7 @@ AskUserCustomUrl() {
         eos_yad --entry
         --title="$INS_CUST_TEXT"
         --text="${INS_CUST_TEXT2}. $INS_CUST_TEXT3."
-        --image=$WELCOME_ICON_QUESTION
+        --image=$ICO_QUESTION
     )
 
     url=$("${cmd[@]}")
@@ -371,15 +344,15 @@ GeneralInfo() {
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
-      --image=$WELCOME_ICON_QUESTION
+      --image=$ICO_QUESTION
       --text="$text"
       --text-align=left
-      --field=" $(ltr general_info_ws)!$ICO_INFO_WEB!https://endeavouros.com":fbtn          "WelcomeBrowser https://endeavouros.com"
-      --field=" $(ltr general_info_wi)!$ICO_INFO_WEB!$(ltr general_info_witip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com"
-      --field=" $(ltr general_info_ne)!$ICO_INFO_WEB!$(ltr general_info_netip)":fbtn        "WelcomeBrowser https://endeavouros.com/news"
-      --field=" $(ltr general_info_fo)!$ICO_INFO_WEB!$(ltr general_info_fotip)":fbtn        "WelcomeBrowser https://forum.endeavouros.com"
-      --field=" $(ltr general_info_do)!$ICO_INFO_WEB!$(ltr general_info_dotip)":fbtn        "WelcomeBrowser https://endeavouros.com/donate"
-      --field=" $(ltr general_info_ab)!$ICO_INFO_WEB!$(ltr general_info_abtip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com/endeavouros-tools/welcome"
+      --field=" $(ltr general_info_ws)!$ICO_TIPS!https://endeavouros.com":fbtn          "WelcomeBrowser https://endeavouros.com"
+      --field=" $(ltr general_info_wi)!$ICO_TIPS!$(ltr general_info_witip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com"
+      --field=" $(ltr general_info_ne)!$ICO_TIPS!$(ltr general_info_netip)":fbtn        "WelcomeBrowser https://endeavouros.com/news"
+      --field=" $(ltr general_info_fo)!$ICO_TIPS!$(ltr general_info_fotip)":fbtn        "WelcomeBrowser https://forum.endeavouros.com"
+      --field=" $(ltr general_info_do)!$ICO_TIPS!$(ltr general_info_dotip)":fbtn        "WelcomeBrowser https://endeavouros.com/donate"
+      --field=" $(ltr general_info_ab)!$ICO_TIPS!$(ltr general_info_abtip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com/endeavouros-tools/welcome"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -472,7 +445,7 @@ AfterInstall() {
   local tabcontents=(
       eos_yad --align-buttons
       --use-interp  # don't need explicit 'bash -c' construct when calling functions
-      --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
+      --plug="$handle" --tabnum="$tabnum" --form --image=$ICO_SYSTOOLS
       --text="$text" --columns=2
   )
   MirrorRankingButtons
@@ -502,7 +475,7 @@ AfterInstall() {
           --field=" $(ltr after_install_r8168)!$ICO_SYSTOOLS!$(ltr after_install_r8168_tip)":fbtn "ethernet_toggle_r8168_r8169"
       )
   fi
-  tabcontents+=(--field=" $(ltr ins_logtool)!$ICO_LOG!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+  tabcontents+=(--field=" $(ltr ins_logtool)!$ICO_SYSTOOLS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
   VboxGuestEnable
 
   case "$CurrentDesktop" in
@@ -530,7 +503,7 @@ AddXfceThemingButtons() {
         msg+="The new theme will be in folders $conf2/{$dirs_list}\n\n"
         msg+="Accept theme change and reboot now?"
 
-        eos_yad --form --title="Change Xfce theme to $new_theme" --text="$msg" --image=preferences-desktop-theme \
+        eos_yad --form --title="Change Xfce theme to $new_theme" --text="$msg" --image=$ICO_THEME \
                 --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
 
         case "$?" in
@@ -588,7 +561,7 @@ DailyAssistant() {
 
   local tabcontents=(
       eos_yad --align-buttons --use-interp  # don't need explicit 'bash -c' construct when calling functions
-      --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
+      --plug="$handle" --tabnum="$tabnum" --form --image=$ICO_SYSTOOLS
       --text="$text" --columns=2
       # --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"    # "RunInTerminal UpdateInTerminal --lang=$lang"
       # --field=" $(ltr after_install_us) (UpdateInTerminal)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
@@ -597,8 +570,8 @@ DailyAssistant() {
   MirrorRankingButtons
   tabcontents+=(--field=" Pacdiff $_and $differ!$ICO_SYSTOOLS!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
-      --field=" $(ltr ins_logtool)!$ICO_LOG!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
-      --field=" $(ltr daily_assist_anews)!$ICO_NEWS!$(ltr daily_assist_anewstip)":fbtn "WelcomeBrowser https://archlinux.org/news"
+      --field=" $(ltr ins_logtool)!$ICO_SYSTOOLS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
+      --field=" $(ltr daily_assist_anews)!$ICO_INFO_WEB!$(ltr daily_assist_anewstip)":fbtn "WelcomeBrowser https://archlinux.org/news"
   )
 
   # General app browsing buttons:
@@ -646,7 +619,7 @@ WelcomeInitialTab() {
     txt+="After selecting the initial tab, Welcome will be restarted.\n"
     local cmd=(
         eos_yad --form --align-buttons --use-interp --title="Welcome initial tab"
-        --text="$txt" --image=$WELCOME_ICON_PREFERENCES
+        --text="$txt" --image=$ICO_PREFERENCES_SYSTEM
         --field="Initial tab number\t\t":num "$EOS_WELCOME_ACTIVE_TAB_NUMBER!$ICO_PREFERENCES_DISPLAY!1"
     )
     local result="$("${cmd[@]}" | cut -d '|' -f1)"
@@ -682,7 +655,7 @@ UsefulTips() {
   local tabcontents+=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
-      --image=$WELCOME_ICON_TIPS
+      --image=$ICO_TIPS
       --text="$text"
 
       --field=" $(ltr after_install_pm)!$ICO_INFO_WEB!$(ltr after_install_pmtip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/?s=pacman'"
@@ -714,7 +687,7 @@ AddMoreApps() {
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --text-align=left --columns=2
-      --image=$WELCOME_ICON_INSTALL_INFO
+      --image=$ICO_INSTALL
   )
   local shown_app_buttons=0
 
@@ -818,7 +791,7 @@ OwnCommands() {
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --columns=$cols
-      --image=$WELCOME_ICON_OWN_COMMANDS
+      --image=$ICO_OWN_COMMANDS
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
   )
   if [ "$show_buttons" = "yes" ] ; then
@@ -879,7 +852,7 @@ WelcomeHelp_opt() {
                     --fontname="Mono 10" \
                     --text="<b>$WH_BUTT_TEXT</b>" \
                     --text-align=left \
-                    --image=$WELCOME_ICON_HELP --button=yad-ok:0
+                    --image=$ICO_HELP --button=yad-ok:0
 }
 WelcomeHelp() {
     WelcomeBrowser "https://discovery.endeavouros.com/endeavouros-tools/welcome"
@@ -967,7 +940,7 @@ EOF
 
     case "$value" in
         disable)
-            eos_yad --form --image=$WELCOME_ICON_INFO --text="$(ltr settings_dis_contents)" \
+            eos_yad --form --image=$ICO_INFO --text="$(ltr settings_dis_contents)" \
                     --title="$(ltr settings_dis_title)" \
                     --button=" $(ltr settings_dis_butt)!$ICO_EXIT!$(ltr settings_dis_buttip)":11
             ;;
@@ -1052,7 +1025,7 @@ R8168check_at_install() {
                 local cmd=(
                     eos_yad
                     --form
-                    --image=$WELCOME_ICON_QUESTION
+                    --image=$ICO_QUESTION
                     --title="Select the driver for the Realtek 8168 Ethernet card"
                     --text="$txt"
                     --button="r8168":1
@@ -1169,7 +1142,7 @@ VboxGuestEnable() {
                 local cmd="systemctl enable --now vboxservice.service"
                 local msgvb="$msg1\n<b>$label</b>"
                 local icon=$WELCOME_ICON_TIPS
-                eos_yad --form --title="Info" --text="$msgvb" --image=$WELCOME_ICON_TIPS --button=yad-quit:0 &
+                eos_yad --form --title="Info" --text="$msgvb" --image=$ICO_TIPS --button=yad-quit:0 &
                 tabcontents+=(--field=" $label!$ICO_ENABLE!$cmd":fbtn "RunInTerminal $cmd")
             fi
             ;;
@@ -1272,6 +1245,60 @@ SetCalamaresVersionInfo() {
     fi
 }
 
+
+AssignIconVariables() {
+    # button icons, see
+    #   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s04.html
+    #   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s02.html
+
+    export ICO_INFO_WEB=dialog-information       # maybe: user-info
+
+    if [ -x /bin/xdg-mime ] ; then
+        local default_app="$(xdg-mime query default text/html)"   # e.g. firefox.desktop
+        case "$default_app" in
+            chromium.desktop)
+                export ICO_INFO_WEB=chromium ;;
+            firefox.desktop)
+                export ICO_INFO_WEB=firefox ;;
+            firefoxdeveloperedition.desktop)
+                export ICO_INFO_WEB=firefox-developer-edition ;;
+            opera.desktop)
+                export ICO_INFO_WEB=opera ;;
+            vivaldi-stable.desktop)
+                export ICO_INFO_WEB=vivaldi ;;
+        esac
+    fi
+    export ICO_NEWS=help-browser
+    export ICO_CHANGES=document-new
+    export ICO_HELP=help-contents
+    export ICO_BOOKMARK=user-bookmarks
+    export ICO_EXIT=application-exit
+    export ICO_SAD=$ICO_EXIT                         # maybe: face-sad
+    export ICO_ANGEL=face-angel
+    export ICO_CUSTOM=preferences-desktop-personal
+    export ICO_PREFERENCES_DISPLAY=$ICO_CUSTOM       # maybe: preferences-system
+    export ICO_MIRROR_RANK=view-refresh              # was: system-search
+    export ICO_INSTALL=system-software-install
+    export ICO_LOG=dialog-information
+    export ICO_GPARTED=drive-harddisk
+    export ICO_UPDATE=system-software-update
+    export ICO_SYSTOOLS=applications-utilities
+    export ICO_WALL=preferences-desktop-wallpaper
+    export ICO_WALL_DOWNLOAD=emblem-downloads
+    export ICO_THEME=preferences-desktop-theme
+    export ICO_ENABLE=system-run
+
+    # only in installer (not from freedesktop.org...)
+    export ICO_CALAMARES=calamares
+    export ICO_QUESTION=dialog-question
+    export ICO_PREFERENCES_SYSTEM=preferences-system
+    export ICO_TIPS=user-info
+    export ICO_INFO=dialog-information
+    export ICO_OWN_COMMANDS=applications-other
+
+}
+
+
 StartHere() {
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
@@ -1288,6 +1315,8 @@ StartHere() {
     local has_a_connection=no
     local ISO_VERSION=""                      # only for the installer
     local CurrentDesktop=""
+
+    AssignIconVariables
 
     GetCurrentDesktop CurrentDesktop
 
@@ -1310,7 +1339,7 @@ StartHere() {
             while true ; do
                 eos_yad --form \
                         --title="What next?" \
-                        --image=dialog-question \
+                        --image=$ICO_QUESTION \
                         --text="Internet connection not found.\nDo you want to quit, wait for a connection, or continue without a connection?" \
                         --button="Quit!Quit this program":1 \
                         --button="Wait $((sleeptime * rounds))s and ask!Wait a few seconds for a connection":3 \
