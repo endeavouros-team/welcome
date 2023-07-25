@@ -475,7 +475,7 @@ AfterInstall() {
           --field=" $(ltr after_install_r8168)!$ICO_SYSTOOLS!$(ltr after_install_r8168_tip)":fbtn "ethernet_toggle_r8168_r8169"
       )
   fi
-  tabcontents+=(--field=" $(ltr ins_logtool)!$ICO_SYSTOOLS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+  tabcontents+=(--field=" $(ltr ins_logtool)!$ICO_LOG!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
   VboxGuestEnable
 
   case "$CurrentDesktop" in
@@ -570,7 +570,7 @@ DailyAssistant() {
   MirrorRankingButtons
   tabcontents+=(--field=" Pacdiff $_and $differ!$ICO_SYSTOOLS!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
-      --field=" $(ltr ins_logtool)!$ICO_SYSTOOLS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
+      --field=" $(ltr ins_logtool)!$ICO_LOG!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
       --field=" $(ltr daily_assist_anews)!$ICO_INFO_WEB!$(ltr daily_assist_anewstip)":fbtn "WelcomeBrowser https://archlinux.org/news"
   )
 
@@ -672,7 +672,7 @@ UsefulTips() {
   tabcontents+=(
       --field=" $(ltr after_install_ft)!$ICO_INFO_WEB!$(ltr after_install_fttip)":fbtn     "WelcomeBrowser https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
       --field=" EndeavourOS $_and ARM!$ICO_INFO_WEB!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "WelcomeBrowser https://arm.endeavouros.com"
-      --field=" $(ltr butt_owncmds_help)!$ICO_INFO_WEB!$(ltr nb_tab_owncmdstip)":fbtn      "WelcomeBrowser $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
+      --field=" $(ltr butt_owncmds_help)!$ICO_INFO_WEB!$(ltr nb_tab_owncmdstip)":fbtn      "WelcomeBrowser $adding_own_commands"
       --field=" $(ltr butt_owncmds_dnd)!$ICO_SYSTOOLS!$(ltr butt_owncmds_dnd_help)":fbtn   "welcome-dnd"
   )
 
@@ -796,8 +796,7 @@ OwnCommands() {
   )
   if [ "$show_buttons" = "yes" ] ; then
       tabcontents+=(
-          --field=" $(ltr butt_owncmds_help)!$ICO_INFO_WEB!$(ltr nb_tab_owncmdstip)":fbtn
-                  "WelcomeBrowser $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
+          --field=" $(ltr butt_owncmds_help)!$ICO_INFO_WEB!$(ltr nb_tab_owncmdstip)":fbtn   "WelcomeBrowser $adding_own_commands"
           --field=" $(ltr butt_owncmds_dnd)!$ICO_CUSTOM!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
       )
   fi
@@ -1251,50 +1250,64 @@ AssignIconVariables() {
     #   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s04.html
     #   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s02.html
 
-    export ICO_INFO_WEB=dialog-information       # maybe: user-info
+    ico() {
+        case "$1" in
+            apps|devices|mimetypes|places|status) ;;
+            *) DIE "${FUNCNAME[1]}: icon type '$1' unsupported" ;;
+        esac
+        case "$2" in
+            "") DIE "${FUNCNAME[1]}: icon name missing" ;;
+        esac
+        local icon=$icondir/$1/$2.svg
+        [ -e $icon ] || DIE "${FUNCNAME[1]}: icon '$icon' not found"
+        echo $icon
+    }
+
+    local icondir=/usr/share/icons/Qogir/scalable
+
+    export ICO_INFO_WEB=$(ico apps dialog-information)       # maybe: user-info
 
     if [ -x /bin/xdg-mime ] ; then
         local default_app="$(xdg-mime query default text/html)"   # e.g. firefox.desktop
         case "$default_app" in
             chromium.desktop)
-                export ICO_INFO_WEB=chromium ;;
+                export ICO_INFO_WEB=$(ico apps chromium) ;;
             firefox.desktop)
-                export ICO_INFO_WEB=firefox ;;
+                export ICO_INFO_WEB=$(ico apps firefox) ;;
             firefoxdeveloperedition.desktop)
-                export ICO_INFO_WEB=firefox-developer-edition ;;
+                export ICO_INFO_WEB=$(ico apps firefox-developer-edition) ;;
             opera.desktop)
-                export ICO_INFO_WEB=opera ;;
+                export ICO_INFO_WEB=$(ico apps opera) ;;
             vivaldi-stable.desktop)
-                export ICO_INFO_WEB=vivaldi ;;
+                export ICO_INFO_WEB=$(ico apps vivaldi) ;;
         esac
     fi
-    export ICO_NEWS=help-browser
-    export ICO_CHANGES=document-new
-    export ICO_HELP=help-contents
-    export ICO_BOOKMARK=user-bookmarks
-    export ICO_EXIT=application-exit
-    export ICO_SAD=$ICO_EXIT                         # maybe: face-sad
+    export ICO_NEWS=$(ico apps newsflash)
+    export ICO_CHANGES=$(ico mimetypes text-x-changelog)
+    export ICO_HELP=$(ico apps system-help)
+    export ICO_BOOKMARK=$(ico places bookmarks)
+    export ICO_EXIT=$(ico apps preferences-desktop-user)
+    export ICO_SAD=$ICO_EXIT
     export ICO_ANGEL=face-angel
-    export ICO_CUSTOM=preferences-desktop-personal
-    export ICO_PREFERENCES_DISPLAY=$ICO_CUSTOM       # maybe: preferences-system
-    export ICO_MIRROR_RANK=view-refresh              # was: system-search
-    export ICO_INSTALL=system-software-install
-    export ICO_LOG=dialog-information
-    export ICO_GPARTED=drive-harddisk
-    export ICO_UPDATE=system-software-update
-    export ICO_SYSTOOLS=applications-utilities
-    export ICO_WALL=preferences-desktop-wallpaper
-    export ICO_WALL_DOWNLOAD=emblem-downloads
-    export ICO_THEME=preferences-desktop-theme
-    export ICO_ENABLE=system-run
+    export ICO_CUSTOM=$(ico apps preferences-desktop-tweaks)
+    export ICO_PREFERENCES_DISPLAY=$(ico apps preferences-desktop-display)
+    export ICO_MIRROR_RANK=$(ico apps preferences-system-performance)
+    export ICO_INSTALL=$(ico apps system-software-install)
+    export ICO_LOG=$(ico apps utilities-log-viewer)
+    export ICO_GPARTED=$(ico devices drive-harddisk)
+    export ICO_UPDATE=$(ico apps system-software-update)
+    export ICO_SYSTOOLS=$(ico apps applications-utilities)
+    export ICO_WALL=$(ico apps preferences-desktop-wallpaper)
+    export ICO_WALL_DOWNLOAD=$(ico mimetypes application-x-partial-download)
+    export ICO_THEME=$(ico apps preferences-desktop-theme)
+    export ICO_ENABLE=$(ico apps system-run)
 
-    # only in installer (not from freedesktop.org...)
-    export ICO_CALAMARES=calamares
-    export ICO_QUESTION=dialog-question
-    export ICO_PREFERENCES_SYSTEM=preferences-system
-    export ICO_TIPS=user-info
-    export ICO_INFO=dialog-information
-    export ICO_OWN_COMMANDS=applications-other
+    export ICO_CALAMARES=$(ico apps calamares)
+    export ICO_QUESTION=$(ico apps system-help)
+    export ICO_PREFERENCES_SYSTEM=$(ico apps preferences-system)
+    export ICO_TIPS=$(ico apps user-info)
+    export ICO_INFO=$(ico apps dialog-information)
+    export ICO_OWN_COMMANDS=$(ico apps applications-featured)
 
 }
 
@@ -1469,6 +1482,9 @@ StartHere() {
         return
     fi
 
+    # local adding_own_commands=$(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)
+    # gitlab doesn't have this file yet...
+    local adding_own_commands=https://github.com/endeavouros-team/welcome/blob/master/Adding-own-commands.md
     local own_commands_conf="$HOME/.config/welcome-own-cmds.conf"
 
     if [ -r    "$own_commands_conf" ] ; then
