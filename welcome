@@ -294,7 +294,7 @@ INSTALL() {
 
       --field=" $(ltr ins_start)!$ICO_INSTALL!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
       --field=" $(ltr install_community)!$ICO_INSTALL!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
-      --field=" EndeavourOS ARM Image Installer!$ICO_INSTALL!Start installing EndeavourOS ARM edition":fbtn    "arm-eos-welcome-installer"
+      --field=" EndeavourOS ARM Image Installer!$ICO_INSTALL_ARM!Start installing EndeavourOS ARM edition":fbtn    "arm-eos-welcome-installer"
   )
   if [ "$has_a_connection" = "yes" ] ; then
       MirrorRankingButtons
@@ -1302,13 +1302,21 @@ AssignIconVariables() {
     export ICO_THEME=$(ico apps preferences-desktop-theme)
     export ICO_ENABLE=$(ico apps system-run)
 
-    export ICO_CALAMARES=$(ico apps calamares)
     export ICO_QUESTION=$(ico apps system-help)
     export ICO_PREFERENCES_SYSTEM=$(ico apps preferences-system)
     export ICO_TIPS=$(ico apps user-info)
     export ICO_INFO=$(ico apps dialog-information)
     export ICO_OWN_COMMANDS=$(ico apps applications-featured)
 
+    ## Alternatives for ICO_INSTALL_ARM:
+    # export ICO_INSTALL_ARM=$(ico devices media-flash)
+    # export ICO_INSTALL_ARM=$(ico devices drive-removable-media)
+    export ICO_INSTALL_ARM=$(ico apps usb-creator)
+
+    case "$XDG_SESSION_DESKTOP" in    # or $XDG_CURRENT_DESKTOP
+        KDE) export ICO_CALAMARES=/usr/share/icons/breeze-dark/apps/48/calamares.svg ;;
+        *)   export ICO_CALAMARES=$(ico apps calamares) ;;
+    esac
 }
 
 
