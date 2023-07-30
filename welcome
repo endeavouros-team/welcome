@@ -875,11 +875,7 @@ export -f ImportantNews
 
 SetBrowser() {
     [ -n "$_WELCOME_BROWSER" ] && return
-    if [ "$is_installing" = "yes" ] && [ "$CurrentDesktop" = "kde" ] ; then
-        export _WELCOME_BROWSER=firefox
-    else
-        export _WELCOME_BROWSER="$(eos_select_browser)"
-    fi
+    export _WELCOME_BROWSER="$(eos_select_browser)"
 }
 export -f SetBrowser
 
@@ -1247,6 +1243,11 @@ SetCalamaresVersionInfo() {
     fi
 }
 
+VerboseLog() {
+    if [ "$WELCOME_VERBOSE_LOG" = "yes" ] ; then
+        echo "$@" >> /tmp/welcome-verbose.log
+    fi
+}
 
 AssignIconVariables() {
     # button icons, see
@@ -1285,6 +1286,8 @@ AssignIconVariables() {
                 export ICO_INFO_WEB=$(ico apps vivaldi) ;;
         esac
     fi
+    VerboseLog "ICO_INFO_WEB = $ICO_INFO_WEB"
+
     export ICO_NEWS=$(ico apps newsflash)
     export ICO_CHANGES=$(ico mimetypes text-x-changelog)
     export ICO_HELP=$(ico apps system-help)
@@ -1339,6 +1342,12 @@ StartHere() {
     local has_a_connection=no
     local ISO_VERSION=""                      # only for the installer
     local CurrentDesktop=""
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --verboselog) export WELCOME_VERBOSE_LOG=yes ;;
+        esac
+    done
 
     GetCurrentDesktop CurrentDesktop
     AssignIconVariables
@@ -1430,6 +1439,7 @@ StartHere() {
             --tr-prefer=*) tr_prefer="${arg#*=}" ;;
             --id=*) MagicId "${arg#*=}" || return 0 ;;
             --ni=*) MagicId_new "${arg#*=}" || return 0 ;;
+            --verboselog) ;;
             --genlang=*)
                 lang="${arg#*=}"
                 _init_translations --tr-engine="$tr_engine" --generate "$lang"
@@ -1479,6 +1489,7 @@ StartHere() {
             --once | -1) allow_run_if_disabled=yes ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) ;;                                             # already handled!
+            --verboselog) ;;                                             # already handled!
             --version) echo "$PROG_VERSION" >&2 ; return ;;
             --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --ni=*) ;; # already handled!
             --testing) testing=yes ;;
