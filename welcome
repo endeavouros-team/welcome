@@ -874,9 +874,12 @@ ImportantNews() {
 export -f ImportantNews
 
 SetBrowser() {
-    local xx
     [ -n "$_WELCOME_BROWSER" ] && return
-    export _WELCOME_BROWSER="$(eos_select_browser)"
+    if [ "$is_installing" = "yes" ] && [ "$CurrentDesktop" = "kde" ] ; then
+        export _WELCOME_BROWSER=firefox
+    else
+        export _WELCOME_BROWSER="$(eos_select_browser)"
+    fi
 }
 export -f SetBrowser
 
@@ -1313,8 +1316,8 @@ AssignIconVariables() {
     # export ICO_INSTALL_ARM=$(ico devices drive-removable-media)
     export ICO_INSTALL_ARM=$(ico apps usb-creator)
 
-    case "$XDG_SESSION_DESKTOP" in    # or $XDG_CURRENT_DESKTOP
-        KDE) export ICO_CALAMARES=/usr/share/icons/breeze-dark/apps/48/calamares.svg ;;
+    case "$CurrentDesktop" in
+        kde) export ICO_CALAMARES=/usr/share/icons/breeze-dark/apps/48/calamares.svg ;;
         *)   export ICO_CALAMARES=$(ico apps calamares) ;;
     esac
 }
@@ -1337,9 +1340,8 @@ StartHere() {
     local ISO_VERSION=""                      # only for the installer
     local CurrentDesktop=""
 
-    AssignIconVariables
-
     GetCurrentDesktop CurrentDesktop
+    AssignIconVariables
 
     export show_installer=no    # explicitly show the installer, for testing only
     for arg in "$@" ; do
