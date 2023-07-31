@@ -134,7 +134,7 @@ AskMode() {
             eos_yad --form
             --title="$(ltr cal_choose)"
             --text="$(ltr cal_choose)"
-            --image=$WELCOME_ICON_INSTALL_OFFICIAL
+            --image=$ICO_CALAMARES
             --columns=2
             --height=200 --width=500 --scroll
             --buttons-layout=spread

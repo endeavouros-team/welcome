@@ -535,9 +535,10 @@ PacdiffIcon() {
     for differ in "${EOS_WELCOME_PACDIFFERS[@]}" ; do
         if [ -x /usr/bin/$differ ] ; then
             case "$differ" in
-                kompare)      differ_icon=$differ ;;
-                meld)         differ_icon=org.gnome.meld ;;
-                *)            differ_icon=$(eos_IconGrasp "$differ") ;;                    #kdiff3|diffuse|code|vim)
+                kompare)      differ_icon=$ICO_KOMPARE ;;
+                meld)         differ_icon=$ICO_MELD ;;
+                vim)          differ_icon=$ICO_VIM ;;
+                *)            differ_icon=$ICO_COMPARE ;;                    # kdiff3 diffuse
             esac
             break
         fi
@@ -554,8 +555,8 @@ DailyAssistant() {
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
 
-  local differ=""                         # PacdiffIcon may change
-  local differ_icon=preferences-system    # PacdiffIcon may change
+  local differ=""                   # PacdiffIcon may change
+  local differ_icon=$ICO_COMPARE    # PacdiffIcon may change
 
   PacdiffIcon
 
@@ -568,7 +569,7 @@ DailyAssistant() {
   )
   AddEosAurHelpers
   MirrorRankingButtons
-  tabcontents+=(--field=" Pacdiff $_and $differ!$ICO_SYSTOOLS!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
+  tabcontents+=(--field=" Pacdiff $_and $differ!$differ_icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
       --field=" $(ltr ins_logtool)!$ICO_LOG!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
       --field=" $(ltr daily_assist_anews)!$ICO_INFO_WEB!$(ltr daily_assist_anewstip)":fbtn "WelcomeBrowser https://archlinux.org/news"
@@ -1139,7 +1140,7 @@ VboxGuestEnable() {
                 local msg1="$(ltr after_install_vbox2)"
                 local cmd="systemctl enable --now vboxservice.service"
                 local msgvb="$msg1\n<b>$label</b>"
-                local icon=$WELCOME_ICON_TIPS
+                local icon=$ICO_TIPS
                 eos_yad --form --title="Info" --text="$msgvb" --image=$ICO_TIPS --button=yad-quit:0 &
                 tabcontents+=(--field=" $label!$ICO_ENABLE!$cmd":fbtn "RunInTerminal $cmd")
             fi
@@ -1254,75 +1255,38 @@ AssignIconVariables() {
     #   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s04.html
     #   https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s02.html
 
-    ico() {
-        case "$1" in
-            apps|devices|mimetypes|places|status) ;;
-            *) DIE "${FUNCNAME[1]}: icon type '$1' unsupported" ;;
-        esac
-        case "$2" in
-            "") DIE "${FUNCNAME[1]}: icon name missing" ;;
-        esac
-        local icon=$icondir/$1/$2.svg
-        [ -e $icon ] || DIE "${FUNCNAME[1]}: icon '$icon' not found"
-        echo $icon
-    }
+    AssignIconVariables_in_eos_bash_shared
 
-    local icondir=/usr/share/icons/Qogir/scalable
-
-    export ICO_INFO_WEB=$(ico apps dialog-information)       # maybe: user-info
-
-    if [ -x /bin/xdg-mime ] ; then
-        local default_app="$(xdg-mime query default text/html)"   # e.g. firefox.desktop
-        case "$default_app" in
-            chromium.desktop)
-                export ICO_INFO_WEB=$(ico apps chromium) ;;
-            firefox.desktop)
-                export ICO_INFO_WEB=$(ico apps firefox) ;;
-            firefoxdeveloperedition.desktop)
-                export ICO_INFO_WEB=$(ico apps firefox-developer-edition) ;;
-            opera.desktop)
-                export ICO_INFO_WEB=$(ico apps opera) ;;
-            vivaldi-stable.desktop)
-                export ICO_INFO_WEB=$(ico apps vivaldi) ;;
-        esac
-    fi
     VerboseLog "ICO_INFO_WEB = $ICO_INFO_WEB"
 
-    export ICO_NEWS=$(ico apps newsflash)
-    export ICO_CHANGES=$(ico mimetypes text-x-changelog)
-    export ICO_HELP=$(ico apps system-help)
-    export ICO_BOOKMARK=$(ico places bookmarks)
-    export ICO_EXIT=$(ico apps preferences-desktop-user)
-    export ICO_SAD=$ICO_EXIT
-    export ICO_ANGEL=face-angel
-    export ICO_CUSTOM=$(ico apps preferences-desktop-tweaks)
-    export ICO_PREFERENCES_DISPLAY=$(ico apps preferences-desktop-display)
-    export ICO_MIRROR_RANK=$(ico apps preferences-system-performance)
-    export ICO_INSTALL=$(ico apps system-software-install)
-    export ICO_LOG=$(ico apps utilities-log-viewer)
-    export ICO_GPARTED=$(ico devices drive-harddisk)
-    export ICO_UPDATE=$(ico apps system-software-update)
-    export ICO_SYSTOOLS=$(ico apps applications-utilities)
-    export ICO_WALL=$(ico apps preferences-desktop-wallpaper)
-    export ICO_WALL_DOWNLOAD=$(ico mimetypes application-x-partial-download)
-    export ICO_THEME=$(ico apps preferences-desktop-theme)
-    export ICO_ENABLE=$(ico apps system-run)
+    export ICO_BOOKMARK=$(eos_icon_path places bookmarks)
+    export ICO_EXIT=$(eos_icon_path apps preferences-desktop-user)
+    export ICO_CUSTOM=$(eos_icon_path apps preferences-desktop-tweaks)
+    export ICO_PREFERENCES_DISPLAY=$(eos_icon_path apps preferences-desktop-display)
+    export ICO_MIRROR_RANK=$(eos_icon_path apps preferences-system-performance)
+    export ICO_GPARTED=$(eos_icon_path devices drive-harddisk)
+    export ICO_WALL=$(eos_icon_path apps preferences-desktop-wallpaper)
+    export ICO_WALL_DOWNLOAD=$(eos_icon_path mimetypes application-x-partial-download)
+    export ICO_THEME=$(eos_icon_path apps preferences-desktop-theme)
+    export ICO_ENABLE=$(eos_icon_path apps system-run)
+    export ICO_OWN_COMMANDS=$(eos_icon_path apps applications-featured)
 
-    export ICO_QUESTION=$(ico apps system-help)
-    export ICO_PREFERENCES_SYSTEM=$(ico apps preferences-system)
-    export ICO_TIPS=$(ico apps user-info)
-    export ICO_INFO=$(ico apps dialog-information)
-    export ICO_OWN_COMMANDS=$(ico apps applications-featured)
+    export ICO_SAD=$ICO_EXIT
+    #export ICO_ANGEL=face-angel
 
     ## Alternatives for ICO_INSTALL_ARM:
-    # export ICO_INSTALL_ARM=$(ico devices media-flash)
-    # export ICO_INSTALL_ARM=$(ico devices drive-removable-media)
-    export ICO_INSTALL_ARM=$(ico apps usb-creator)
+    # export ICO_INSTALL_ARM=$(eos_icon_path devices media-flash)
+    # export ICO_INSTALL_ARM=$(eos_icon_path devices drive-removable-media)
+    export ICO_INSTALL_ARM=$(eos_icon_path apps usb-creator)
 
     case "$CurrentDesktop" in
         kde) export ICO_CALAMARES=/usr/share/icons/breeze-dark/apps/48/calamares.svg ;;
-        *)   export ICO_CALAMARES=$(ico apps calamares) ;;
+        *)   export ICO_CALAMARES=$(eos_icon_path apps calamares) ;;
     esac
+    export ICO_MELD=/usr/share/icons/Qogir/scalable/apps/meld.svg
+    export ICO_VIM=/usr/share/icons/Qogir/scalable/apps/vim.svg
+    export ICO_KOMPARE=/usr/share/icons/Qogir/scalable/apps/kompare.svg
+    export ICO_COMPARE=/usr/share/icons/Qogir/scalable/apps/bcompare.svg
 }
 
 
