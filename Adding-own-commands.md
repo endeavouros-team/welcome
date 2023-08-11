@@ -18,31 +18,37 @@
 ## Overview
 You can personalize Welcome by adding new command buttons in the Welcome app. They will appear under tab **Personal Commands**.<br>
 To personalize Welcome, add your new commands into file
+
 ```
 $HOME/.config/welcome-own-cmds.conf
 ```
 
 ## Command syntax
 The Welcome app uses **yad forms** and bash language to create a simple GUI.
-<br>
+
 <sup>Note that you don't need to be familiar with yad nor bash (but it may help!) to add your own commands.
 Simply follow this short tutorial.<br>
 (More info with terminal commands: `man yad`, `man bash`).
 </sup>
 
 Let's start with a simple Firefox example (this already works for Welcome!):
+
 ```
 local welcome_own_commands=(
     --field=" Firefox web browser!!":fbtn "firefox"
 )
 ```
+
 You will add commands to Welcome by adding <u>yad form fields</u> to a bash array variable named
+
 ```
   welcome_own_commands
 ```
+
 This variable (and possible other variables in this file) <u>should</u> be marked as a *local* variable in bash.<br>
 
 Buttons for Welcome are defined using specially crafted *fields*. Each field defines a command for a button, for example:
+
 ```
     --field=" Firefox web browser!firefox-default!Browse the web with Firefox":fbtn  "firefox"
 ```
@@ -73,6 +79,7 @@ Older versions of the `yad` program didn't support aligning text properly on but
 This is no more needed, but you may see old definitions using it, and it can be ignored and/or safely removed.
 
 An example field about the parameters (using the obsolete _align() marking) in the command string:
+
 ```
     # _align() is no more required
     --field="_align(EndeavourOS forum)!web-browser!Discussions at the EndeavourOS forum":fbtn
@@ -80,21 +87,24 @@ An example field about the parameters (using the obsolete _align() marking) in t
 ```
 
 Other supported (but optional) variables are
+
 - `activate_own_commands_tab`: specifies whether the active tab in Welcome is your personal commands (instead of Welcome's default) when Welcome is started.
 - `columns_for_own_commands`: specifies the layout (specifically: number of columns) of the buttons under the Personal Commands tab. Note: the layout is managed by **yad** and may *not* contain exactly the specified number of columns!
 - `show_predefined_buttons_at_own_commands`: specifies whether to show (yes) or not (no) the two predefined buttons as the first buttons of the Personal Commands tab.
+
 Note that the same two buttons exist on the **Tips** tab.
 
 For example:
+
 ```
 local activate_own_commands_tab=yes               # "yes" or "no" (default: no)
 local columns_for_own_commands=4                  # a small positive number (default: 2)
 local show_predefined_buttons_at_own_commands=no  # "yes" or "no" (default:yes)
 ```
 
-
 ## Example
 Here is a full *example* file containing three commands/buttons, and activating personal commands tab when starting Welcome:
+
 ```
 #!/bin/bash
 
@@ -124,10 +134,11 @@ local show_predefined_buttons_at_own_commands=no
 
 This example shows how to use bash functions in the command string.<br>
 After writing your bash function, there are two "additional" things to remember:
+
 - export your bash function with: `export -f`
 - command string structure changes to: `"bash -c 'MyBashFunction parameters'"`
-```
 
+```
 Install_with_pacman() {
     # This bash function installs one or more given packages. Does not reinstall any packages.
 
@@ -161,6 +172,7 @@ local welcome_own_commands=(
     --field=" Install example!system-software-install!Install some popular packages":fbtn "bash -c 'Install_with_pacman code vlc'"
 )
 ```
+
 <sup>Tip: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.</sup>
 
 ## Example: field to run commands in terminal with `RunInTerminal`
@@ -203,6 +215,7 @@ If you have any questions about the syntax, please go to https://forum.endeavour
 A new function based API for defining personal commands is described below.
 
 Personal commands user interface consists of the following functions:
+
 ```
 personal_commands_init       Determines how personal commands will be shown.
 personal_commands_add        Adds a new personal command.
@@ -218,13 +231,15 @@ Show predefined buttons in the personal commands tab | "yes" or "no" | yes
 
 If `personal_commands_init` is *not* called, then default values will be used.
 
-Note that if `personal_commands_init` is called with "empty" parameters, then respective default values will be used. For example:
+Note that if `personal_commands_init` is called with "empty" parameters, then respective default values will be used.<br>
+For example:
+
 ```
 personal_commands_init "" "" no
 ```
+
 will preserve the defaults for the first two parameters, and change only the third.
 
-<br>
 
 ### Parameters for `personal_commands_add`
 
@@ -236,7 +251,6 @@ Name of an icon (that exists in the system) | accessories-text-editor | no (but 
 A more detailed description for the button | Mousepad text editor | no
 Actual program name (use only if first parameter is ambiguous)  | mousepad | no
 
-<br>
 
 Note about the first and the fifth parameter:<br>The actual program name will be parsed from the first parameter (i.e. the first word of it). After parsing, the personal command is handled as follows:
 - If the parsed program exists, the command will be accepted to the list of personal commands.
@@ -268,4 +282,5 @@ personal_commands_add "xed --new-window" \
                       "Xed text editor with new window" \
                       "xed"
 ```
+
 Note the last line of the example, the 5th parameter `"xed"`. Actually, in this particular case, it is not really needed, but serves only as an example.
