@@ -20,6 +20,13 @@ GUIDIE() {
     exit 1
 }
 
+GetCurrentDesktop() {    # returns desktop name in lowercase
+    local -n _de="$1"
+    local DE=""
+    eos_yad__detectDE
+    _de="$DE"
+}
+
 ### Provides the install log contents. ###
 FollowFile() {
     local tailfile="$1"
@@ -27,7 +34,10 @@ FollowFile() {
     local xpos="$3"
     local ypos="$4"
 
-    xfce4-terminal -T "$term_title" --geometry=120x20+$xpos+$ypos -x tail -f "$tailfile" &
+    case "$CurrentDesktop" in
+        xfce) xfce4-terminal -T "$term_title" --geometry=120x20+$xpos+$ypos -x tail -f "$tailfile" & ;;
+        kde) setsid konsole -e tail -f "$tailfile" &> /dev/null ;;
+    esac
 }
 
 ### Provides the pacman log. ###
@@ -129,6 +139,12 @@ Calamares_Start() {
 ### Dialog that asks for the online or offline edition. ###
 AskMode() {
     local ret=0
+    local desktopname=""
+
+    case "$CurrentDesktop" in
+        xfce) desktopname="Xfce" ;;
+        kde)  desktopname="KDE" ;;
+    esac
 
     local cmd=(
             eos_yad --form
@@ -142,15 +158,15 @@ AskMode() {
     if [ $has_connection = yes ] ; then
         cmd+=(
             --field="$(ltr cal_info3)":LBL ""
-            --field="$(ltr cal_info2)":LBL ""
-            --button="Online!!Vanilla theming, internet required":11
-            --button="Offline!!Xfce, EndeavourOS theming, internet not required":13
+            --field="$(ltr cal_info2 $desktopname)":LBL ""
+            --button="Online!!$desktopname, internet required":11
+            --button="Offline!!$desktopname, internet not required":13
         )
     else
         # without connection only offline is possible
         cmd+=(
-            --field="$(ltr cal_info2)":LBL ""
-            --button="Offline!!Xfce, EndeavourOS theming, internet not required":13
+            --field="$(ltr cal_info2 $desktopname)":LBL ""
+            --button="Offline!!$desktopname, internet not required":13
         )
     fi
 
@@ -161,9 +177,9 @@ AskMode() {
 
     # set the install mode, or exit on error
     case "$ret" in
-        11|12) mode=online ;;
-        13|14) mode=offline ;;
-        252|*) exit $ret ;;
+        11) mode=online ;;
+        13) mode=offline ;;
+        252|*) exit $ret ;;  # 252 = close using the "corner X"
     esac
 }
 
@@ -271,6 +287,9 @@ Main() {
     fi
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
 
+    local CurrentDesktop=""
+    GetCurrentDesktop CurrentDesktop   # in lowercase
+    
     local lang="$1"
     local mode="$2"                             # 'community' or '' (empty)
     local ShowInstallLog="FALSE"                # TRUE --> show install log terminal window
