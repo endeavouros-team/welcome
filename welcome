@@ -1210,12 +1210,6 @@ export -f Usage
 #                  to install. Package names are listed as one package name per line.
 #                  Empty lines and comments (lines starting with character #) are allowed.
 
-GetCurrentDesktop() {
-    local -n _de="$1"
-    local DE="" ; eos_yad__detectDE
-    _de="$DE"
-}
-
 GetIsoVersion() {
     if [ -z "$ISO_VERSION" ] ; then
         local file=/usr/lib/endeavouros-release
@@ -1278,11 +1272,6 @@ AssignIconVariables() {
     # export ICO_INSTALL_ARM=$(eos_icon_path devices media-flash)
     # export ICO_INSTALL_ARM=$(eos_icon_path devices drive-removable-media)
     export ICO_INSTALL_ARM=$(eos_icon_path apps usb-creator)
-
-    case "$CurrentDesktop" in
-        kde) export ICO_CALAMARES=/usr/share/icons/breeze-dark/apps/48/calamares.svg ;;
-        *)   export ICO_CALAMARES=$(eos_icon_path apps calamares) ;;
-    esac
     export ICO_MELD=/usr/share/icons/Qogir/scalable/apps/meld.svg
     export ICO_VIM=/usr/share/icons/Qogir/scalable/apps/vim.svg
     export ICO_KOMPARE=/usr/share/icons/Qogir/scalable/apps/kompare.svg

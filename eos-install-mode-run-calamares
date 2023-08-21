@@ -20,13 +20,6 @@ GUIDIE() {
     exit 1
 }
 
-GetCurrentDesktop() {    # returns desktop name in lowercase
-    local -n _de="$1"
-    local DE=""
-    eos_yad__detectDE
-    _de="$DE"
-}
-
 ### Provides the install log contents. ###
 FollowFile() {
     local tailfile="$1"
@@ -146,6 +139,9 @@ AskMode() {
         kde)  desktopname="KDE" ;;
     esac
 
+    local offline_tip="$(ltr cal_info2 $desktopname) $(ltr cal_info5)"
+    local online_tip=""
+
     local cmd=(
             eos_yad --form
             --title="$(ltr cal_choose)"
@@ -156,17 +152,18 @@ AskMode() {
             --buttons-layout=spread
     )
     if [ $has_connection = yes ] ; then
+        online_tip="$(ltr cal_info3 $desktopname) $(ltr cal_info6)"
         cmd+=(
-            --field="$(ltr cal_info3)":LBL ""
-            --field="$(ltr cal_info2 $desktopname)":LBL ""
-            --button="Online!!$desktopname, internet required":11
-            --button="Offline!!$desktopname, internet not required":13
+            --field="$online_tip":LBL ""
+            --field="$offline_tip":LBL ""
+            --button="Online!$ICO_CONNECTION!$online_tip":11
+            --button="Offline!$ICO_NO_CONNECTION!$offline_tip":13
         )
     else
         # without connection only offline is possible
         cmd+=(
-            --field="$(ltr cal_info2 $desktopname)":LBL ""
-            --button="Offline!!$desktopname, internet not required":13
+            --field="$offline_tip":LBL ""
+            --button="Offline!$ICO_NO_CONNECTION!$offline_tip":13
         )
     fi
 
@@ -275,12 +272,13 @@ CheckUserPkglist() {
 
 ###  Everything starts in the Main function. ###
 Main() {
-    local progname="$(basename "$0")"           # for help and messages
+    local progname="${0##*/}"           # for help and messages
     local has_connection=no
 
     eos-connection-checker && has_connection=yes
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+    AssignIconVariables_in_eos_bash_shared
     export -f eos_yad
     if [ ! -x /usr/bin/calamares ] ; then
         GUIDIE "this program is only for installing EndeavourOS with calamares"
