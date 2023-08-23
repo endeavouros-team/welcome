@@ -152,7 +152,7 @@ AskMode() {
             --buttons-layout=spread
     )
     if [ $has_connection = yes ] ; then
-        online_tip="$(ltr cal_info3 $desktopname) $(ltr cal_info6)"
+        online_tip="$(ltr cal_info3) $(ltr cal_info6)"
         cmd+=(
             --field="$online_tip":LBL ""
             --field="$offline_tip":LBL ""
