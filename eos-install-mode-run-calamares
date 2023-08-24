@@ -126,7 +126,10 @@ InstallLog_Start() {
 
 ### Starts calamares and runs it in the background. ###
 Calamares_Start() {
-    pkexec calamares -style kvantum -D8 >> $log &
+    case "$CurrentDesktop" in
+        kde) kdesu -t -c "calamares -D8" >> $log & ;;
+        *)   pkexec calamares -D8 >> $log & ;;
+    esac
 }
 
 ### Dialog that asks for the online or offline edition. ###
@@ -287,12 +290,19 @@ Main() {
 
     local CurrentDesktop=""
     GetCurrentDesktop CurrentDesktop   # in lowercase
+
+    local testing=no
+
+    case "$1" in
+        --testing) testing=yes; shift ;;
+    esac
     
     local lang="$1"
     local mode="$2"                             # 'community' or '' (empty)
     local ShowInstallLog="FALSE"                # TRUE --> show install log terminal window
     local ShowPacmanLog="FALSE"                 # TRUE --> show pacman  log terminal window
     local Home=/home/liveuser                   # liveuser's home folder
+    [ $testing = yes ] && Home=/tmp/FOOBAR
     local log=$Home/endeavour-install.log       # install log
     local cfolder=/etc/calamares                # folder for calamares configuration files
     local workdir=""
@@ -322,7 +332,7 @@ Main() {
         online | offline | community)
             sudo cp $cfolder/settings_$mode.conf $cfolder/settings.conf
             PreLog "File settings.conf updated."
-            sudo bash /home/$EOS_LIVEUSER/user_commands.bash --iso-config $mode
+            sudo bash $Home/user_commands.bash --iso-config $mode
             ;;
         *)
             GUIDIE "unsupported mode '$mode'"

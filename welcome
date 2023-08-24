@@ -292,21 +292,22 @@ INSTALL() {
       --text="$text"
       --text-align=left
 
-      --field=" $(ltr ins_start)!$ICO_INSTALL!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
-      --field=" $(ltr install_community)!$ICO_INSTALL!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
+      --field=" $(ltr ins_start)!$ICO_CALAMARES!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
+      # --field=" $(ltr install_community)!$ICO_INSTALL!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
       --field=" EndeavourOS ARM Image Installer!$ICO_INSTALL_ARM!Start installing EndeavourOS ARM edition":fbtn    "arm-eos-welcome-installer"
   )
   if [ "$has_a_connection" = "yes" ] ; then
       MirrorRankingButtons
   fi
+  case "$CurrentDesktop" in
+      kde)      tabcontents+=(--field=" $(ltr ins_pm)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn 'partitionmanager') ;;
+      xfce | *) tabcontents+=(--field=" $(ltr ins_pm)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn 'gparted') ;;
+  esac
 
-  tabcontents+=(
-      --field=" $(ltr ins_pm)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn                  'gparted'
-  )
   ShowChangeResoButton
   if [ "$has_a_connection" = "yes" ] ; then
       tabcontents+=(
-          --field=" $(ltr ins_blue_notes)!$ICO_TIPS!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
+          --field=" $(ltr ins_blue_notes)!$ICO_BLUETOOTH!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
           --field=" $(ltr ins_rel)!$ICO_TIPS!$(ltr ins_reltip)":fbtn                   "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
           --field=" $(ltr ins_tips)!$ICO_TIPS!$(ltr ins_tipstip)":fbtn              "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
           --field=" $(ltr ins_syslog)!$ICO_TIPS!$(ltr ins_syslogtip)":fbtn          "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
@@ -667,7 +668,7 @@ UsefulTips() {
   fi
   tabcontents+=(
       --field=" $(ltr after_install_hn)!$ICO_INFO_WEB!$(ltr after_install_hntip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/?s=Hardware'"
-      --field=" $(ltr after_install_bt)!$ICO_INFO_WEB!$(ltr after_install_bttip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03'"  # 'https://discovery.endeavouros.com/bluetooth'
+      --field=" $(ltr after_install_bt)!$ICO_BLUETOOTH!$(ltr after_install_bttip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03'"  # 'https://discovery.endeavouros.com/bluetooth'
   )
   test "$(eos_GetArch)" != "armv7h" && tabcontents+=(--field=" $(ltr after_install_nv)!$ICO_INFO_WEB!$(ltr after_install_nvtip)":fbtn "WelcomeBrowser https://discovery.endeavouros.com/category/nvidia")
   tabcontents+=(
