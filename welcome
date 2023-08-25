@@ -300,7 +300,7 @@ INSTALL() {
       MirrorRankingButtons
   fi
   case "$CurrentDesktop" in
-      kde)      tabcontents+=(--field=" $(ltr ins_pm)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn 'partitionmanager') ;;
+      kde)      tabcontents+=(--field=" $(ltr ins_pm)!$ICO_PARTITIONMANAGER!$(ltr ins_pmtip2)":fbtn 'partitionmanager') ;;
       xfce | *) tabcontents+=(--field=" $(ltr ins_pm)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn 'gparted') ;;
   esac
 
@@ -1260,6 +1260,7 @@ AssignIconVariables() {
     export ICO_PREFERENCES_DISPLAY=$(eos_icon_path apps preferences-desktop-display)
     # export ICO_GPARTED=$(eos_icon_path devices drive-harddisk)
     export ICO_GPARTED=$(eos_icon_path apps gparted)
+    export ICO_PARTITIONMANAGER=$(eos_icon_path apps partitionmanager)
     export ICO_WALL=$(eos_icon_path apps preferences-desktop-wallpaper)
     export ICO_WALL_DOWNLOAD=$(eos_icon_path mimetypes application-x-partial-download)
     export ICO_THEME=$(eos_icon_path apps preferences-desktop-theme)
