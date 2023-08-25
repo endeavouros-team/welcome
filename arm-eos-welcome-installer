@@ -5,10 +5,26 @@ PROBLEM() {
     local problem=(
         eos_yad --form --image=$ICO_ERROR
         --title="ARM installer problem"
-        --text="$msg"
+        --text="$progname: $msg"
         --button=yad-quit:1
     )
     "${problem[@]}"
+}
+
+DIE() {
+    PROBLEM "$1"
+    exit 1
+}
+
+SelectTerminal() {
+    local xx
+    for xx in "${terminals_supported[@]}" ; do
+        if which "$xx" &> /dev/null ; then
+            echo "$xx"
+            return 0
+        fi
+    done
+    return 1
 }
 
 ARM_installer_in_terminal() {
@@ -34,7 +50,7 @@ ARM_installer_in_terminal() {
             fi
             cd $targetdir
             chmod +x image-install-calamares.sh                                 # sudo not needed here?
-            xfce4-terminal --maximize -e "sudo ./image-install-calamares.sh"
+            $terminal -e "sudo ./image-install-calamares.sh"
             return
         else
             msg="ARM installer fetch failed (git code $errcode) from\n<tt>$url</tt>\n\n"
@@ -51,13 +67,24 @@ export -f ARM_installer_in_terminal
 
 InfoPage() {
     local browser="firefox"
+    [ -x /usr/bin/$browser ] || browser="kde-open"
     [ -x /usr/bin/$browser ] || browser="xdg-open"
     $browser https://arm.endeavouros.com/installation
 }
 export -f InfoPage
 
 Main() {
+    local progname=${0##*/}
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    AssignIconVariables_in_eos_bash_shared
+
+    local terminals_supported=(konsole xfce4-terminal)
+    local terminal="$(SelectTerminal)"
+    [ -n "$terminal" ] || DIE "no terminal found"
+    case "$terminal" in
+        konsole)          terminal+=" --fullscreen" ;;
+        xfce4-terminal)   terminal+=" --maximize" ;;
+    esac
 
     local info_url="https://arm.endeavouros.com/installation"
     local icon=$ICO_CALAMARES
