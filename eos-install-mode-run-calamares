@@ -281,15 +281,14 @@ Main() {
     eos-connection-checker && has_connection=yes
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+    local CurrentDesktop=""
+    GetCurrentDesktop CurrentDesktop   # in lowercase
     AssignIconVariables_in_eos_bash_shared
     export -f eos_yad
     if [ ! -x /usr/bin/calamares ] ; then
         GUIDIE "this program is only for installing EndeavourOS with calamares"
     fi
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
-
-    local CurrentDesktop=""
-    GetCurrentDesktop CurrentDesktop   # in lowercase
 
     local testing=no
 
