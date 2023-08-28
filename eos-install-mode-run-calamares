@@ -150,8 +150,8 @@ AskMode() {
             --title="$(ltr cal_choose)"
             --text="$(ltr cal_choose)"
             --image=$ICO_CALAMARES
-            --columns=2
-            --height=200 --width=600 --scroll
+            --columns=2 --borders=10
+            --height=180 --width=600 --scroll
             --buttons-layout=spread
     )
     if [ $has_connection = yes ] ; then
