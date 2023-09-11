@@ -628,18 +628,23 @@ WelcomeInitialTab() {
     [ -z "$result" ] && return
     sed -i $welcome_configurator -e "s|^EOS_WELCOME_ACTIVE_TAB_NUMBER=[0-9]*|EOS_WELCOME_ACTIVE_TAB_NUMBER=$result|"
 
+    RestartWelcome
+}
+export -f WelcomeInitialTab
+
+RestartWelcome() {
     local tmpfile=$(mktemp $HOME/.cache/.greeter_restart.XXXXX)
     cat <<EOF > $tmpfile
 pkill -f "/usr/bin/yad --window-icon=$EOS_WICON"
 sleep 0.2
-eos-welcome ${WELCOME_ARGS} &
+eos-welcome ${WELCOME_ARGS} "$@" &
 sleep 0.5
 rm -f $tmpfile
 EOF
     chmod +x $tmpfile
     $tmpfile
 }
-export -f WelcomeInitialTab
+export -f RestartWelcome
 
 Github2Gitlab() {
     eos-github2gitlab "$@"
@@ -722,6 +727,7 @@ AddMoreApps() {
 #### Support for personal commands:
 
 personal_commands_add() {   # add one personal command
+    [ "$is_installing" = "yes" ] && return
     local commandline="$1"
     local name="$2"
     local icon="$3"
@@ -740,6 +746,7 @@ personal_commands_add() {   # add one personal command
 }
 
 personal_commands_init() {  # initialize user settings for personal commands
+    [ "$is_installing" = "yes" ] && return
     [ -n "$1" ] && activate_own_commands_tab="$1"
     [ -n "$2" ] && columns_for_own_commands="$2"
     [ -n "$3" ] && show_predefined_buttons_at_own_commands="$3"
@@ -830,8 +837,10 @@ CreateNotebookCommands() {
             AddMoreApps
         )
     fi
-    if [ -n "$welcome_own_commands" ] ; then
-        _NOTEBOOK_TABS+=(OwnCommands)
+    if [ "$is_installing" = "no" ] ; then
+        if [ -n "$welcome_own_commands" ] ; then
+            _NOTEBOOK_TABS+=(OwnCommands)
+        fi
     fi
     export _NOTEBOOK_TABS_COUNT=${#_NOTEBOOK_TABS[@]}
 }
@@ -1280,6 +1289,83 @@ AssignIconVariables() {
     export ICO_COMPARE=/usr/share/icons/Qogir/scalable/apps/bcompare.svg
 }
 
+LangChoose() {
+    local cmd=(
+        eos_yad --list
+        --title="Select language variation for 'Welcome'"
+        --column="Language" --column=""
+        --width=400 --height=600
+
+        "English"                               en_US
+        "Catalan (català)"                      ca_AD
+        "German (Deutsch)"                      de_DE
+        "Spanish (Español・Española)"           es_ES
+        "Persian (فارسی)"                       fa_IR
+        "Finnish (Suomi)"                       fi_FI
+        "French (Francés・Francesa)"            fr_FR
+        "India (हिंदी-भारत)"                        hi_IN
+        "Croatian (Hrvatski)"                   hr_HR
+        "Icelandic (Íoslainnis)"                is_IS
+        "Italian (Italiano・Italiana)"          it_IT
+        "Japanese (日本語)"                     ja_JP
+        "Polish (Polski)"                       pl_PL
+        "Portuguese (Português)"                pt_PT
+        "Portuguese-Brazil (Português-Brasil)"  pt_BR
+        "Romanian (Română)"                     ro_RO
+        "Russian (Русский)"                     ru_RU
+        # "Serbian (Srpski)" sr_?        # translation file incorrectly named as translation-rs.bash; rs should be: sr !!
+        "Sweden (Svenska)"                      se_NO
+        "Slovak (slovenský)"                    sk_SK
+        "Thai (แบบไทย)"                         th_TH
+        "Ukrainian (українська)"                uk_UA
+        "Chinese-China (中文-中国)"             zh_CN
+        "Chinese-HongKong (中文-香港)"          zh_HK
+        "Chinese-Singapore (中文-新加坡)"       zh_SG
+        "Chinese-Taiwan (中文-台灣)"            zh_TW
+    )
+    if [ -z "$lang" ] ; then
+        local out
+        out=$("${cmd[@]}")
+        [ -n "$out" ] || return                                    # defaults to English
+        lang=$(echo "$out" | cut -d'|' -f2)
+    fi
+    if [ "$is_installing" = "yes" ] ; then
+        # change locale only when installing
+        if [ -z "$(grep "^$lang.UTF-8 UTF-8$" /etc/locale.gen)" ] ; then
+            cp /etc/locale.gen /tmp/locale.gen.tmp
+            echo "$lang.UTF-8 UTF-8" >> /tmp/locale.gen.tmp
+            sudo cp /tmp/locale.gen.tmp /etc/locale.gen
+            sudo locale-gen
+        fi
+        export LANG="$lang.UTF-8"
+    fi
+}
+export -f LangChoose
+
+LanguageSelection() {
+    # $lang must match the '*' in the translation file names, i.e.
+    # /usr/share/endeavouros/scripts/translation-*.bash.
+
+    local lang=""
+
+    LangChoose ALL
+
+    # convert user given language to supported translations in package eos-translations
+    case "$lang" in
+        pt | pt_BR | zh_* | uk_*) ;;
+        *) lang=${lang%%_*} ;;
+    esac
+
+    RestartWelcome --lang=$lang
+}
+export -f LanguageSelection
+
+LanguageSelectionButton() {
+    [ "$is_installing" = "no" ] && return
+    lang=""
+    local ico=/usr/share/icons/Qogir/scalable/apps/applications-languages.svg
+    notebook+=(--button=" Change Language!$ico!Select another supported language for Welcome":"LanguageSelection")
+}
 
 StartHere() {
     local arg lang
@@ -1314,8 +1400,8 @@ StartHere() {
         esac
     done
 
-    local is_installing
-    IsInstalling && is_installing=yes || is_installing=no
+    local is_installing=no
+    IsInstalling && is_installing=yes
 
     if eos-connection-checker ; then
         has_a_connection=yes
@@ -1572,6 +1658,10 @@ StartHere() {
         fi
     fi
     notebook+=(--active-tab=$active_tab_nr)
+
+    if [ "$is_installing" = "yes" ] ; then
+        LanguageSelectionButton
+    fi
 
     if [ "$has_a_connection" = "yes" ] ; then
         notebook+=(--button=" $(ltr butt_softnews)!$ICO_NEWS!$(ltr butt_softnews_tip)":"ImportantNews")

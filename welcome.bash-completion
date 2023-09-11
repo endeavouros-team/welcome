@@ -1,0 +1,56 @@
+# bash completion for welcome        -*- shell-script -*-
+
+_welcome_complete_simple() {
+    COMPREPLY=($(compgen -W "$1" -- "$cur"))
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+}
+
+_welcome_complete_open() {
+    COMPREPLY=($(compgen "$@"))
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+}
+
+_welcome_() {
+    local cur prev #words cword split
+    _init_completion -s || return
+
+    local -r opts=(
+        --help -h
+        --enable -f
+        --disable
+        --once -1
+        --installer
+        --version
+        --lang=
+        --startdelay=
+        
+    )
+    local -r langs=(ca de en es fa fi fr hi hr is it ja pl pt pt_BT ro
+                    # rs  ???
+                    ru se sk th uk_UA zh_CN zh_HK zh_SG zh_TW)
+
+    # Handle options that need sub-options.
+    # Each option "case" should return immediately.
+
+    case "$prev" in
+        --lang)
+            _welcome_complete_simple "${langs[*]}"
+            ;;
+        --startdelay)
+            _welcome_complete_open -P "$cur" -W "{0..9}"
+            ;;
+        *)
+            # Handle all top-level parameters.
+            case "$cur" in
+                -* | "")
+                    # Any option or nothing yet.
+                    _welcome_complete_simple "${opts[*]}"
+                    ;;
+                *)
+                    # Non-option parameters.
+                    ;;
+            esac
+            ;;
+    esac
+} &&
+complete -F _welcome_ welcome eos-welcome
