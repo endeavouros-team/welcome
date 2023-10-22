@@ -886,7 +886,10 @@ export -f ImportantNews
 
 SetBrowser() {
     [ -n "$_WELCOME_BROWSER" ] && return
-    export _WELCOME_BROWSER="$(eos_select_browser)"
+    case "$is_installing" in
+        yes) export _WELCOME_BROWSER=firefox ;;
+        *)   export _WELCOME_BROWSER="$(eos_select_browser)" ;;
+    esac
 }
 export -f SetBrowser
 
@@ -1409,6 +1412,7 @@ StartHere() {
         if [ $is_installing = yes ] ; then
             if type systemsettings >& /dev/null ; then
                 systemsettings kcm_networkmanagement
+                eos-connection-checker && has_a_connection=yes
             else
                 local sleeptime=1
                 local rounds=10
