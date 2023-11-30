@@ -29,8 +29,7 @@ SelectTerminal() {
 
 ARM_installer_in_terminal() {
     local urls=(
-        https://github.com/endeavouros-arm/images.git
-        # https://github.com/pudges-place/exper-images.git
+        "$ARM_IMAGES_GIT_PAGE"
     )
     local url ix count=${#urls[@]}
     local errcode
@@ -44,10 +43,10 @@ ARM_installer_in_terminal() {
         git clone $url $targetdir 2>/dev/null
         errcode=$?
         if [ $errcode -eq 0 ] ; then
-            if [ "$Manuels_internal_testing" = "yes" ] ; then
-                PROBLEM "$FUNCNAME called for testing only."
-                return
-            fi
+            #if [ "$Manuels_internal_testing" = "yes" ] ; then
+            #    PROBLEM "$FUNCNAME called for testing only."
+            #    return
+            #fi
             cd $targetdir
             chmod +x image-install-calamares.sh                                 # sudo not needed here?
             $terminal -e "sudo ./image-install-calamares.sh"
@@ -69,14 +68,23 @@ InfoPage() {
     local browser="firefox"
     [ -x /usr/bin/$browser ] || browser="kde-open"
     [ -x /usr/bin/$browser ] || browser="xdg-open"
-    $browser https://arm.endeavouros.com/installation
+    $browser "$ARM_INFO_PAGE"
 }
 export -f InfoPage
 
 Main() {
     local progname=${0##*/}
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+
+    # common configs
+    local file=/usr/share/endeavouros/scripts/eos-script-lib-yad
+    source $file || DIE "file $file not found"
     AssignIconVariables_in_eos_bash_shared
+
+    # ARM configs
+    file=/etc/welcome-installer.conf
+    source $file               || DIE "file $file not found"
+    [ "$ARM_INFO_PAGE" ]       || DIE "variable ARM_INFO_PAGE not set in $file"
+    [ "$ARM_IMAGES_GIT_PAGE" ] || DIE "variable ARM_IMAGES_GIT_PAGE not properly set in $file"
 
     local terminals_supported=(konsole xfce4-terminal)
     local terminal="$(SelectTerminal)"
@@ -86,7 +94,6 @@ Main() {
         xfce4-terminal)   terminal+=" --maximize" ;;
     esac
 
-    local info_url="https://arm.endeavouros.com/installation"
     local icon=$ICO_CALAMARES
     local title="EndeavourOS ARM image installer"
     local text=""

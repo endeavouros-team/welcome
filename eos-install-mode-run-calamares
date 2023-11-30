@@ -9,9 +9,13 @@ GUIDIE() {
     # show error in the terminal and log
     echo "$progname: $1" | sed -e 's|<tt>||g' -e 's|</tt>||g'  # remove some formatting tags
 
+    local prog=eos_yad
+    [ "$EOS_WICON" ] || prog=yad
+
     # show the error in a yad window
     local cmd=(
-        eos_yad --form --title="Error detected" --text="<tt>$progname</tt>:\n$1\n"
+        $prog --form --title="Error detected"
+        --text="<b>$progname:</b>\n$1\n"
         --image=dialog-error
         --button=yad-quit:1
     )
@@ -205,8 +209,8 @@ InstallWithLogs() {
 }
 
 run_hotfix_start() {
-    local file=hotfix-start.bash
-    local url=$(eos-github2gitlab https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file)
+    local file=${HOTFIX_START_FILE##*/}   # file=hotfix-start.bash
+    local url=$(eos-github2gitlab $HOTFIX_START_FILE)
 
     if Wget2Curl --timeout=30 -q -O "$workdir/$file" "$url" ; then
         sudo bash "$workdir/$file" >> "$prelogfile"
@@ -277,21 +281,30 @@ CheckUserPkglist() {
 Main() {
     local progname="${0##*/}"           # for help and messages
     local has_connection=no
+    local src_file
+    local src_files=(
+        /usr/share/endeavouros/scripts/eos-script-lib-yad
+        /etc/welcome-installer.conf
+    )
+
+    for src_file in "${src_files[@]}" ; do
+        source $src_file || GUIDIE "file <tt>$src_file</tt> not found?"
+    done
+    export -f eos_yad
+
+    [ -n "$HOTFIX_START_FILE" ] || GUIDIE "variable <tt>HOTFIX_START_FILE</tt> not set in <tt>/etc/welcome-installer.conf</tt>"
+
+    [ -x /usr/bin/calamares ] || GUIDIE "<tt>/usr/bin/calamares</tt> is needed for installing EndeavourOS"
 
     eos-connection-checker && has_connection=yes
 
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
     local CurrentDesktop=""
-    GetCurrentDesktop CurrentDesktop   # in lowercase
+    GetCurrentDesktop CurrentDesktop          # in lowercase
     AssignIconVariables_in_eos_bash_shared
-    export -f eos_yad
-    if [ ! -x /usr/bin/calamares ] ; then
-        GUIDIE "this program is only for installing EndeavourOS with calamares"
-    fi
-    source /usr/share/endeavouros/scripts/translations.bash || exit 1
+
+    source /usr/share/endeavouros/scripts/translations.bash || GUIDIE "file <tt>/usr/share/endeavouros/scripts/translations.bash</tt> not found?"
 
     local testing=no
-
     case "$1" in
         --testing) testing=yes; shift ;;
     esac
