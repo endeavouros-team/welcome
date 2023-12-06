@@ -415,7 +415,7 @@ AddEosAurHelpers() {
     )
     for helper in "$EOS_AUR_HELPER" "$EOS_AUR_HELPER_OTHER" ; do
         helper="${helper##*/}"
-        if [ -x "/usr/bin/$helper" ] ; then
+        if [ "$helper" ] && [ -x "/usr/bin/$helper" ] ; then
             tabcontents+=(
                 --field=" $(ltr after_install_us) ($helper)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper '$helper'"
             )
