@@ -406,19 +406,25 @@ UpdateWithEosAurHelper() {
 export -f UpdateWithEosAurHelper
 
 AddEosAurHelpers() {
-    local helper=""
+    # Add 'eos-update --aur' if any AUR helper is installed; otherwise add just 'eos-update'.
+    # Add one of: a configured AUR helper, yay, or paru (provided the helper is installed).
 
-    [ "$EOS_AUR_HELPER$EOS_AUR_HELPER_OTHER" = "" ] && return   # ad hoc check for settings
+    local helper=" --aur"
 
+    if [ ! -x /bin/yay ] && [ ! -x /bin/paru ] ; then
+        helper=""
+    fi
     tabcontents+=(
-        --field=" $(ltr after_install_us) (eos-update --aur)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper 'eos-update --aur'"
+        --field=" $(ltr after_install_us) (eos-update$helper)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper 'eos-update$helper'"
     )
-    for helper in "$EOS_AUR_HELPER" "$EOS_AUR_HELPER_OTHER" ; do
+
+    for helper in "$EOS_AUR_HELPER" "$EOS_AUR_HELPER_OTHER" yay paru ; do
         helper="${helper##*/}"
-        if [ "$helper" ] && [ -x "/usr/bin/$helper" ] ; then
+        if [ "$helper" ] && [ -x "/bin/$helper" ] ; then
             tabcontents+=(
                 --field=" $(ltr after_install_us) ($helper)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper '$helper'"
             )
+            break
         fi
     done
 }
