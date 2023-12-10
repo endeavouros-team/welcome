@@ -25,16 +25,15 @@ _welcome_() {
         --startdelay=
         
     )
-    local -r langs=(ca de en es fa fi fr hi hr is it ja pl pt pt_BT ro
-                    # rs  ???
-                    ru se sk th uk_UA zh_CN zh_HK zh_SG zh_TW)
+    local -r langs1=(/usr/share/endeavouros/scripts/translation-*.bash)       # rs  ???
+    local -r langs=$(printf "%s\n" ${langs1[*]} | sed -E 's|/usr.*translation-([^\.]+)\.bash|\1|')
 
     # Handle options that need sub-options.
     # Each option "case" should return immediately.
 
     case "$prev" in
         --lang)
-            _welcome_complete_simple "${langs[*]}"
+            _welcome_complete_simple "$langs"
             ;;
         --startdelay)
             _welcome_complete_open -P "$cur" -W "{0..9}"
