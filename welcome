@@ -1315,7 +1315,7 @@ LangChoose() {
         "Romanian (Română)"                     ro_RO
         "Russian (Русский)"                     ru_RU
         # "Serbian (Srpski)" sr_?        # translation file incorrectly named as translation-rs.bash; rs should be: sr !!
-        "Sweden (Svenska)"                      se_NO
+        "Sweden (Svenska)"                      sv_SE
         "Slovak (slovenský)"                    sk_SK
         "Thai (แบบไทย)"                         th_TH
         "Ukrainian (українська)"                uk_UA
