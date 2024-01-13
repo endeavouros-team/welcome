@@ -342,9 +342,31 @@ Main() {
 
     case "$mode" in
         online | offline | community)
-            sudo cp $cfolder/settings_$mode.conf $cfolder/settings.conf
+            sudo cp $cfolder/settings_$mode.conf $cfolder/settings.conf      # copy the settings based on install mode
             PreLog "File settings.conf updated."
-            sudo bash $Home/user_commands.bash --iso-config $mode
+
+            # User may have pre-calamares configs too.
+            # Note that there are two ways:
+            #  - the old (user_commands.bash)
+            #  - the new (user-commands-before.bash)
+            # and they have slightly different parameters.
+
+            local calamares_config_app opt
+
+            for calamares_config_app in  user-commands-before.bash  user_commands.bash
+            do
+                # set parameters for old and new config files
+                case "$calamares_config_app" in
+                    user_commands.bash) opt="--iso-config" ;;
+                    *)                  opt="" ;;
+                esac
+                if [ -e $Home/$calamares_config_app ] ; then
+                    # config file found, run it now
+                    PreLog "Running user defined $calamares_config_app."
+                    sudo bash $Home/$calamares_config_app $opt $mode
+                    break  # run only one user config file
+                fi
+            done
             ;;
         *)
             GUIDIE "unsupported mode '$mode'"
