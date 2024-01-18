@@ -1315,8 +1315,8 @@ LangChoose() {
         "Romanian (Română)"                     ro_RO
         "Russian (Русский)"                     ru_RU
         # "Serbian (Srpski)" sr_?        # translation file incorrectly named as translation-rs.bash; rs should be: sr !!
-        "Sweden (Svenska)"                      sv_SE
         "Slovak (slovenský)"                    sk_SK
+        "Sweden (Svenska)"                      sv_SE
         "Thai (แบบไทย)"                         th_TH
         "Ukrainian (українська)"                uk_UA
         "Chinese-China (中文-中国)"             zh_CN
@@ -1343,6 +1343,15 @@ LangChoose() {
 }
 export -f LangChoose
 
+LangImplConvert() {
+    # convert user given language to supported translations in package eos-translations
+    case "$lang" in
+        pt_BR | zh_?? | uk_UA) ;;
+        *) lang=${lang%%_*} ;;
+    esac
+}
+export -f LangImplConvert
+
 LanguageSelection() {
     # $lang must match the '*' in the translation file names, i.e.
     # /usr/share/endeavouros/scripts/translation-*.bash.
@@ -1350,12 +1359,7 @@ LanguageSelection() {
     local lang=""
 
     LangChoose ALL
-
-    # convert user given language to supported translations in package eos-translations
-    case "$lang" in
-        pt | pt_BR | zh_* | uk_*) ;;
-        *) lang=${lang%%_*} ;;
-    esac
+    LangImplConvert
 
     RestartWelcome --lang=$lang
 }
@@ -1369,7 +1373,7 @@ LanguageSelectionButton() {
 }
 
 StartHere() {
-    local arg lang
+    local arg lang=""
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
     local tr_prefer=manual
@@ -1496,6 +1500,10 @@ StartHere() {
                 ;;
         esac
     done
+    if [ "$is_installing" = "no" ] && [ -z "$lang" ] ; then
+        lang="$LANG"
+        LangImplConvert
+    fi
 
     _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
 
