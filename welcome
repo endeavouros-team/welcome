@@ -736,7 +736,7 @@ personal_commands_add() {   # add one personal command
     [ -n "$cmd" ] || cmd="$(echo "$commandline" | /usr/bin/awk '{print $1}')"
 
     if (/usr/bin/which $cmd &> /dev/null) ; then
-        welcome_own_commands+=(--field=" $name!$ICO_CUSTOM!$description":fbtn "$commandline")
+        welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$commandline")
     else
         printf "%s: %s\n    %s\n" "$(/usr/bin/date "+%x %X")" "$FUNCNAME:" "warning: command '$cmd' not found" >> /tmp/welcome-personal-commands.log
         echo "$FUNCNAME: warning: command '$cmd' not found" >&2
