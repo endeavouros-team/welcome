@@ -130,8 +130,11 @@ InstallLog_Start() {
 
 ### Starts calamares and runs it in the background. ###
 Calamares_Start() {
+    local kdesu=/usr/lib/kf6/kdesu
+    [ -x $kdesu ] || kdesu=kdesu
+
     case "$CurrentDesktop" in
-        kde) kdesu -t -c "calamares -D8" >> $log & ;;
+        kde) $kdesu -t -c "calamares -D8" >> $log & ;;
         *)   pkexec calamares -D8 >> $log & ;;
     esac
 }
