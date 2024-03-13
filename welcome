@@ -271,7 +271,7 @@ export -f MirrorRankingButtons
 
 ButtonsMayHide() {
   local -n _text_="$1"
-  if [ "$has_a_connection" = "no" ] ; then
+  if [ "$has_a_connection" = "no" ] && [ $is_installing = yes ] ; then
       _text_+="\n$(ltr ins_no_connection)"
   fi
 }
@@ -1637,9 +1637,10 @@ StartHere() {
 
     if [ "$is_installing" = "no" ] ; then
         # try to give a critical notification
-        if [ "$has_a_connection" = "yes" ] ; then
-            local news_date_url="$(Github2Gitlab https://raw.githubusercontent.com/endeavouros-team/Important-news/main/do_notify)"  # this file can contain one or more date defs, one per line
-            local news_date="$(curl -Lsm 10 -o- $news_date_url)"
+        local news_date_url="$(Github2Gitlab https://raw.githubusercontent.com/endeavouros-team/Important-news/main/do_notify)"  # this file can contain one or more date defs, one per line
+        local news_date=""
+        news_date="$(curl --fail -Lsm 10 -o- $news_date_url)"
+        if [ $? -eq 0 ] ; then
             if [ -n "$news_date" ] ; then
                 notebook+=(--text="$(ltr nb_nofify_user1)\n$news_date\n$(ltr nb_nofify_user2) <b>$(ltr butt_softnews)</b> $(ltr nb_nofify_user3)\n")
             fi
@@ -1675,29 +1676,19 @@ StartHere() {
         LanguageSelectionButton
     fi
 
-    if [ "$has_a_connection" = "yes" ] ; then
-        notebook+=(--button=" $(ltr butt_softnews)!$ICO_NEWS!$(ltr butt_softnews_tip)":"ImportantNews")
-        notebook+=(--button=" $(ltr butt_changelog)!$ICO_CHANGES!$(ltr butt_changelogtip)":"WelcomeChangelog")
-    fi
+    notebook+=(--button=" $(ltr butt_softnews)!$ICO_NEWS!$(ltr butt_softnews_tip)":"ImportantNews")
+    notebook+=(--button=" $(ltr butt_changelog)!$ICO_CHANGES!$(ltr butt_changelogtip)":"WelcomeChangelog")
     case "$EOS_WELCOME_HAS_SEE_YOU_LATER_BUTTON" in
         yes)
-            if [ "$has_a_connection" = "yes" ] ; then
-                notebook+=(--button=" $(ltr butt_help)!$ICO_HELP!":"WelcomeHelp")
-            fi
+            notebook+=(--button=" $(ltr butt_help)!$ICO_HELP!":"WelcomeHelp")
             if [ "$is_installing" = "no" ] ; then
                 notebook+=(--button=" $(ltr butt_noshow)!$ICO_SAD!$(ltr butt_noshow)":5)
             fi
             notebook+=(--button=" $(ltr butt_later)!$ICO_ANGEL!$(ltr butt_latertip)":0)
             ;;
         no|*)
-            if [ "$has_a_connection" = "yes" ] ; then
-                if [ "$is_installing" = "no" ] ; then
-                    notebook+=(--button=" $(ltr butt_noshow)!$ICO_SAD!$(ltr butt_noshow)":5)
-                fi
-                notebook+=(--button=" $(ltr butt_help)!$ICO_HELP!":"WelcomeHelp")
-            else
-                notebook+=(--button=yad-quit:1)
-            fi
+            [ "$is_installing" = "no" ] && notebook+=(--button=" $(ltr butt_noshow)!$ICO_SAD!$(ltr butt_noshow)":5)
+            notebook+=(--button=" $(ltr butt_help)!$ICO_HELP!":"WelcomeHelp")
             ;;
     esac
 
