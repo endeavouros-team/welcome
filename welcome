@@ -299,10 +299,9 @@ INSTALL() {
   if [ "$has_a_connection" = "yes" ] ; then
       MirrorRankingButtons
   fi
-  case "$CurrentDesktop" in
-      kde)      tabcontents+=(--field=" $(ltr ins_pm)!$ICO_PARTITIONMANAGER!$(ltr ins_pmtip2)":fbtn 'partitionmanager') ;;
-      xfce | *) tabcontents+=(--field=" $(ltr ins_pm)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn 'gparted') ;;
-  esac
+
+  IsInstalled partitionmanager && tabcontents+=(--field=" $(ltr ins_pm) (partitionmanager)!$ICO_PARTITIONMANAGER!$(ltr ins_pmtip2)":fbtn 'partitionmanager')
+  IsInstalled gparted          && tabcontents+=(--field=" $(ltr ins_pm) (gparted)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn 'gparted')
 
   ShowChangeResoButton
   if [ "$has_a_connection" = "yes" ] ; then
