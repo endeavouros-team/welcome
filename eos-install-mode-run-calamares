@@ -77,16 +77,14 @@ EOF
 }
 
 LogHeader() {
-    local ISO_version=$(cat /usr/lib/endeavouros-release | cut -d'=' -f2)
-    local calamares="$(pacman -Qs calamares | grep ^local/ | head -n1 | sed -E 's|^local/([^ ]+).*|\1|')"
-    local calamares_version="$(pacman -Q $calamares 2>/dev/null | awk '{print $NF}')"
+    local calamares_version="$(pacman -Q calamares 2>/dev/null | awk '{print $NF}')"
     local date=$(date -u "+%x %X")
 
     cat <<EOF > $log
 ########## $log by $progname
 ########## Started (UTC): $date
 ########## Install mode: $mode
-########## ISO version: $ISO_version
+########## ISO version: $iso_version
 ########## Calamares version: $calamares_version
 EOF
     inxi_output
@@ -279,6 +277,10 @@ CheckUserPkglist() {
     fi
 }
 
+GetIsoVersion() {
+    local -r file=/usr/lib/endeavouros-release
+    [ -r $file ] && grep "^VERSION=" $file | sed -E 's|^VERSION=([0-9\.]+).*|\1|'
+}
 
 ###  Everything starts in the Main function. ###
 Main() {
@@ -341,12 +343,12 @@ Main() {
         "" | test) AskMode ;;    # ask the value for $mode
     esac
 
-    if [ $has_connection = yes ] ; then
-        [ $testing = no ] && run_hotfix_start              # run possible hotfixes before copying settings.conf file
+    if [ $has_connection = yes ] && [ "$mode" != "offline" ] ; then
+        [ $testing = no ] && run_hotfix_start                                    # run possible hotfixes before copying settings.conf file
     fi
 
     case "$mode" in
-        online | offline | community)
+        online | offline)
             if [ $testing = no ] ; then
                 sudo cp $cfolder/settings_$mode.conf $cfolder/settings.conf      # copy the settings based on install mode
                 PreLog "File settings.conf updated."
@@ -358,28 +360,18 @@ Main() {
             #  - the new (user-commands-before.bash)
             # and they have slightly different parameters.
 
-            local user_app="$Home/user_commands.bash"
-            local opt=""
-            local has_iso_config_opt=no
+            local cmd=""
+            local -r iso_version="$(GetIsoVersion)"
+            case "$iso_version)" in
+                "" | 202[1-3]*) GUIDIE "ISO version '$iso_version' not supported!" ;;
+                2024.01.*)      cmd="$Home/user_commands.bash --iso-config $mode" ;;      # galileo neo
+                *)              cmd="$Home/user-commands-before.bash $mode" ;;            # gemini or later
+            esac
 
-            # Ad hoc tests to see if there is an old custom file that handles option --iso-config.
-            # Note that this may not work correctly always...
-
-            if [ "$(grep "\--iso-config" "$user_app")" ] ; then
-                if [ "$(grep "^[^#]*--iso-config)" "$user_app")" ] ; then              # likely in "case ... esac"
-                    has_iso_config_opt=yes
-                elif [ "$(grep "^[^#]*if[^#]*--iso-config" "$user_app")" ] ; then      # likely in "if ... fi"
-                    has_iso_config_opt=yes
-                fi
+            if [ $testing = no ] ; then
+                PreLog "Running user defined commands: $cmd"
+                sudo bash $cmd
             fi
-
-            if [ "$has_iso_config_opt" = "yes" ] ; then
-                opt="--iso-config "                                      # a custom file of Galileo Neo or older 
-            else
-                user_app="$Home/user-commands-before.bash"               # a custom file of newer than Galileo Neo
-            fi
-            PreLog "Running user defined custom file: $user_app $opt$mode"
-            [ $testing = no ] && sudo bash $user_app $opt $mode
             ;;
         *)
             GUIDIE "unsupported mode '$mode'"
