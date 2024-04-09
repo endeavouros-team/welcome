@@ -294,7 +294,7 @@ INSTALL() {
 
       --field=" $(ltr ins_start)!$ICO_CALAMARES!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
       # --field=" $(ltr install_community)!$ICO_INSTALL!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
-      --field=" $(ltr ins_arm_start)!$ICO_INSTALL_ARM!$(ltr ins_arm_starttip)":fbtn    "arm-eos-welcome-installer"
+      # --field=" $(ltr ins_arm_start)!$ICO_INSTALL_ARM!$(ltr ins_arm_starttip)":fbtn    "arm-eos-welcome-installer"
   )
   if [ "$has_a_connection" = "yes" ] ; then
       MirrorRankingButtons
