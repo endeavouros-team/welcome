@@ -8,6 +8,8 @@
 # TODO:
 # - add icons to buttons once proper supported exists in yad
 
+BreakPoint() { : ; }
+
 export PROGNAME=eos-welcome
 export PRETTY_PROGNAME="Welcome"
 
@@ -1372,6 +1374,8 @@ LanguageSelectionButton() {
 }
 
 StartHere() {
+    BreakPoint
+
     local arg lang=""
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
@@ -1411,24 +1415,34 @@ StartHere() {
 
     IsInstalling && is_installing=yes
 
+    if [ "$is_installing" = "yes" ] && [ -z "$lang" ] ; then
+        lang="$LANG"
+        LangImplConvert
+        _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
+        AfterTranslations
+    fi
+
+
     if eos-connection-checker ; then
         has_a_connection=yes
     else
         if [ $is_installing = yes ] ; then
             if type systemsettings >& /dev/null ; then
+                local -r ICO_NETWORKMANAGER=/usr/share/icons/Qogir/scalable/apps/networkmanager.svg
                 eos_yad --form \
-                        --title="What next?" \
+                        --title="$(ltr ins_conn_issue_title)" \
                         --image=$ICO_QUESTION \
-                        --text="No internet connection found (maybe wifi startup is slow?)." \
-                        --button="Network manager!!Starts the network manager":1 \
-                        --button="Offline install!!Installs KDE without internet connection":3 \
-                        --button="Exit!!Quit this program":5
+                        --text="$(ltr ins_conn_issue_text)" \
+                        --button="$(ltr ins_conn_issue_nm1)!$ICO_NETWORKMANAGER!$(ltr ins_conn_issue_nm2)":1 \
+                        --button="$(ltr ins_conn_issue_oi1)!$ICO_INSTALL!$(ltr ins_conn_issue_oi2)":3 \
+                        --button="$(ltr ins_conn_issue_ex1)!$ICO_EXIT!$(ltr ins_conn_issue_ex2)":5
                 case "$?" in
                     1) systemsettings kcm_networkmanagement
                        eos-connection-checker && has_a_connection=yes
                        ;;
                     3) install_mode=offline ;;
                     5) return ;;
+                    *) return 1 ;;
                 esac
             else
                 local sleeptime=1
