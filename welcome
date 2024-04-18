@@ -292,7 +292,7 @@ INSTALL() {
       --text="$text"
       --text-align=left
 
-      --field=" $(ltr ins_start)!$ICO_CALAMARES!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
+      --field=" $(ltr ins_start)!$ICO_CALAMARES!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' '$install_mode'"
       # --field=" $(ltr install_community)!$ICO_INSTALL!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
       # --field=" $(ltr ins_arm_start)!$ICO_INSTALL_ARM!$(ltr ins_arm_starttip)":fbtn    "arm-eos-welcome-installer"
   )
@@ -1406,7 +1406,9 @@ StartHere() {
         esac
     done
 
+    local install_mode=""
     local is_installing=no
+
     IsInstalling && is_installing=yes
 
     if eos-connection-checker ; then
@@ -1414,8 +1416,20 @@ StartHere() {
     else
         if [ $is_installing = yes ] ; then
             if type systemsettings >& /dev/null ; then
-                systemsettings kcm_networkmanagement
-                eos-connection-checker && has_a_connection=yes
+                eos_yad --form \
+                        --title="What next?" \
+                        --image=$ICO_QUESTION \
+                        --text="No internet connection found (maybe wifi startup is slow?)." \
+                        --button="Network manager!!Starts the network manager":1 \
+                        --button="Offline install!!Installs KDE without internet connection":3 \
+                        --button="Exit!!Quit this program":5
+                case "$?" in
+                    1) systemsettings kcm_networkmanagement
+                       eos-connection-checker && has_a_connection=yes
+                       ;;
+                    3) install_mode=offline ;;
+                    5) return ;;
+                esac
             else
                 local sleeptime=1
                 local rounds=10
