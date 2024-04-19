@@ -1669,7 +1669,7 @@ StartHere() {
         news_date="$(curl --fail -Lsm 10 -o- $news_date_url)"
         if [ $? -eq 0 ] ; then
             if [ -n "$news_date" ] ; then
-                notebook+=(--text="$(ltr nb_nofify_user1)\n$news_date\n$(ltr nb_nofify_user2) <b>$(ltr butt_softnews)</b> $(ltr nb_nofify_user3)\n")
+                notebook+=(--text="$(ltr nb_notify_user1)\n$news_date\n$(ltr nb_notify_user2) <b>$(ltr butt_softnews)</b> $(ltr nb_notify_user3)\n")
             fi
         fi
     fi
