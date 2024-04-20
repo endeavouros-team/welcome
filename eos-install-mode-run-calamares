@@ -188,10 +188,32 @@ AskMode() {
     esac
 }
 
+PleaseWait() {
+    case "$1" in
+        start)
+            eos_yad --form --width=250 --title="Starting calamares" --text="Please wait..." --image=$ICO_CALAMARES --no-buttons &
+            waitpid=$(ps -ef | grep -wv grep | grep "\--no-buttons" | awk '{print $2}')
+            ;;
+        stop)
+            while ! ps -C calamares ; do
+                sleep 1
+            done
+            sleep 3
+            sudo kill $waitpid
+            ;;
+    esac
+}
+
 ### Starts the calamares installer process and logging. ###
 InstallWithLogs() {
+    local waitpid=""
+
+    PleaseWait start
+
     InstallLog_Start
     Calamares_Start
+
+    PleaseWait stop
 
     if [ "$ShowPacmanLog" = "FALSE" ] ; then
         sleep 5
