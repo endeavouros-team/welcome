@@ -191,7 +191,7 @@ AskMode() {
 PleaseWait() {
     case "$1" in
         start)
-            eos_yad --form --width=250 --title="Starting calamares" --text="Please wait..." --image=$ICO_CALAMARES --no-buttons &
+            eos_yad --form --width=250 --title="$(ltr ins_start_calamares)" --text="$(ltr ins_please_wait)" --image=$ICO_CALAMARES --no-buttons &
             waitpid=$(ps -ef | grep -wv grep | grep "\--no-buttons" | awk '{print $2}')
             ;;
         stop)
