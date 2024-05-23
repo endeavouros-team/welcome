@@ -494,10 +494,12 @@ AddXfceThemingButtons() {
         local -r conf="$HOME/.config"
         local -r conf2='~/.config'
         local -r bak=xfce-theme-bak
-        local -r dirs=(xfce4 Thunar)
-        local -r dirs_list=$(echo "${dirs[*]}" | tr ' ' ',')
         local dir
         local msg=""
+        local dirs=(xfce4)
+        expac -Q %n endeavouros-skel-xfce4 >/dev/null && dirs+=(Thunar)                        # compatibility for old installs
+        local -r dirs_list=$(echo "${dirs[*]}" | tr ' ' ',')
+        
         msg+="About to change the Xfce theme to '$new_theme'.\n"
         msg+="The current theme will be saved under folder $conf2/$bak/$date_time\n"
         msg+="The new theme will be in folders $conf2/{$dirs_list}\n\n"
