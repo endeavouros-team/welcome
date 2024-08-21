@@ -1376,7 +1376,7 @@ LanguageSelectionButton() {
 }
 
 StartHere() {
-    eos-assert-deps $PROGNAME yad || return 1
+    eos_assert_deps $PROGNAME yad || return 1
     BreakPoint
 
     local arg lang=""
