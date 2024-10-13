@@ -1592,9 +1592,7 @@ StartHere() {
         return
     fi
 
-    # local adding_own_commands=$(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)
-    # gitlab doesn't have this file yet...
-    local adding_own_commands=$WELCOME_ADD_COMMANDS_INFO
+    local adding_own_commands=$(Github2Gitlab $WELCOME_ADD_COMMANDS_INFO)
     local own_commands_conf="$HOME/.config/welcome-own-cmds.conf"
 
     if [ -r    "$own_commands_conf" ] ; then
