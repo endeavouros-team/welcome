@@ -1312,6 +1312,7 @@ LangChoose() {
         "Icelandic (Íoslainnis)"                is_IS
         "Italian (Italiano・Italiana)"          it_IT
         "Japanese (日本語)"                     ja_JP
+	"Dutch (Nederlands)"                    nl_NL
         "Polish (Polski)"                       pl_PL
         "Portuguese (Português)"                pt_PT
         "Portuguese-Brazil (Português-Brasil)"  pt_BR
@@ -1347,10 +1348,11 @@ LangChoose() {
 export -f LangChoose
 
 LangImplConvert() {
-    # convert user given language to supported translations in package eos-translations
+    # convert user given language spec to support translation files in package eos-translations
+    lang=${lang%%.*}                           # skip stuff after the dot, e.g. 'nl_NL.UTF-8' to 'nl_NL'
     case "$lang" in
-        pt_BR | zh_?? | uk_UA) ;;
-        *) lang=${lang%%_*} ;;
+	pt_BR | zh_?? | uk_UA | nl_NL) ;;
+        *) lang=${lang%%_*} ;;                 # for the rest we have only support for 'xx' from 'xx_YY'
     esac
 }
 export -f LangImplConvert
@@ -1525,6 +1527,7 @@ StartHere() {
             --verboselog) ;;
             --genlang=*)
                 lang="${arg#*=}"
+                LangImplConvert
                 _init_translations --tr-engine="$tr_engine" --generate "$lang"
                 return
                 ;;
@@ -1532,8 +1535,8 @@ StartHere() {
     done
     if [ "$is_installing" = "no" ] && [ -z "$lang" ] ; then
         lang="$LANG"
-        LangImplConvert
     fi
+    LangImplConvert
 
     BreakPoint
 
