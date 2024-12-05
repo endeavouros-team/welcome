@@ -254,18 +254,18 @@ MirrorRankingButtons() {
     if [ "$(eos_GetArch)" != "armv7h" ] ; then
         if [ -x /usr/bin/reflector-simple ] ; then
             tabcontents+=(
-                --field=" $(ltr after_install_um) (Arch, reflector-simple)!$ICO_MIRROR_RANK!$(ltr after_install_umtip)":fbtn "reflector-simple"
+                --field=" $(ltr after_install_um) (Arch, reflector-simple)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "reflector-simple"
             )
         fi
         if [ -x /usr/bin/rate-mirrors ] ; then
             tabcontents+=(
-                --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umtip)":fbtn "RateMirrors"
+                --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrors"
             )
         fi
     fi
     if [ -x /usr/bin/eos-rankmirrors ] ; then
         tabcontents+=(
-            --field=" $(ltr after_install_um) (EndeavourOS)!$ICO_MIRROR_RANK!$(ltr after_install_umtip)":fbtn "RunInTerminal eos-rankmirrors"
+            --field=" $(ltr after_install_um) (EndeavourOS)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal eos-rankmirrors"
         )
     fi
 }
@@ -401,29 +401,27 @@ RunIfInstalled() {
 export -f RunIfInstalled
 
 UpdateWithEosAurHelper() {
-    local helper="$1"
-    RunInTerminal "echo '==> $helper' ; $helper"
+    local command="$1"
+    RunInTerminal "echo '==> $command' ; $command"
 }
 export -f UpdateWithEosAurHelper
 
 AddEosAurHelpers() {
-    # Add 'eos-update --aur' if any AUR helper is installed; otherwise add just 'eos-update'.
-    # Add one of: a configured AUR helper, yay, or paru (provided the helper is installed).
+    # Add plain eos-update
+    tabcontents+=(--field=" $(ltr after_install_usnat) (eos-update)!$ICO_UPDATE!$(ltr after_install_usnat_tip)":fbtn "UpdateWithEosAurHelper 'eos-update'")
 
-    local helper=" --aur"
-
-    if [ ! -x /bin/yay ] && [ ! -x /bin/paru ] ; then
-        helper=""
+    # Add eos-update --aur if a supported helper is installed
+    if [ -x /bin/yay ] || [ -x /bin/paru ] ; then
+        tabcontents+=(--field=" $(ltr after_install_usnataur) (eos-update --aur)!$ICO_UPDATE!$(ltr after_install_usnataur_tip)":fbtn "UpdateWithEosAurHelper 'eos-update --aur'")
     fi
-    tabcontents+=(
-        --field=" $(ltr after_install_us) (eos-update$helper)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper 'eos-update$helper'"
-    )
 
+    # Add simply the first existing AUR helper
+    local helper=""
     for helper in "$EOS_AUR_HELPER" "$EOS_AUR_HELPER_OTHER" yay paru ; do
         helper="${helper##*/}"
         if [ "$helper" ] && [ -x "/bin/$helper" ] ; then
             tabcontents+=(
-                --field=" $(ltr after_install_us) ($helper)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper '$helper'"
+                --field=" $(ltr after_install_ushlp) ($helper)!$ICO_UPDATE!$(ltr after_install_ushlp_tip)":fbtn "UpdateWithEosAurHelper '$helper'"
             )
             break
         fi
@@ -455,9 +453,9 @@ AfterInstall() {
       --field=" $(ltr after_install_pclean)!$ICO_SYSTOOLS!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
 
-  if [ -x /usr/bin/eos-update-notifier-configure ] ; then
-      tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!$ICO_UPDATE!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
-  fi
+  # if [ -x /usr/bin/eos-update-notifier-configure ] ; then
+  #     tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!$ICO_UPDATE!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
+  # fi
 
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
       tabcontents+=(--field=" $(ltr after_install_cdm)!$ICO_SYSTOOLS!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
