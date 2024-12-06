@@ -100,6 +100,9 @@ AfterTranslations() {
     export INS_CUST_TEXT="$(ltr ins_cust_text)"
     export INS_CUST_TEXT2="$(ltr ins_cust_text2)"
     export INS_CUST_TEXT3="$(ltr ins_cust_text3)"
+
+    export _COMMONPHRASE_ENABLED="$(ltr _commonphrase_enabled)"
+    export _COMMONPHRASE_DISABLED="$(ltr _commonphrase_disabled)"
 }
 
 IsInstalled() { expac -Q %n "$1" >& /dev/null ; }
@@ -658,11 +661,11 @@ Reisub() {
     case "$1" in
         --enable)
             echo 'kernel.sysrq=1' | pkexec tee $file > /dev/null
-            eos_notification $ICO_INFO normal $time REISUB "REISUB enabled" ""
+            eos_notification $ICO_INFO normal $time REISUB "REISUB $_COMMONPHRASE_ENABLED" ""
             ;;
         --disable)
             [ -e $file ] && pkexec rm -f $file
-            eos_notification $ICO_INFO normal $time REISUB "REISUB disabled" ""
+            eos_notification $ICO_INFO normal $time REISUB "REISUB $_COMMONPHRASE_DISABLED" ""
             ;;
     esac
 }
