@@ -42,6 +42,7 @@ export -f eos_yad_GetDesktopName
 export -f eos_GetArch
 export -f eos_select_browser
 export -f eos_yad_nothing_todo
+export -f eos_notification
 #################################################################################
 
 export PROG_PACKAGENAME="welcome"
@@ -650,11 +651,29 @@ Github2Gitlab() {
 }
 export -f Github2Gitlab
 
+Reisub() {
+    local file=/etc/sysctl.d/99-reisub.conf
+    local time=5000
+
+    case "$1" in
+        --enable)
+            echo 'kernel.sysrq=1' | pkexec tee $file > /dev/null
+            eos_notification $ICO_INFO normal $time REISUB "REISUB enabled" ""
+            ;;
+        --disable)
+            [ -e $file ] && pkexec rm -f $file
+            eos_notification $ICO_INFO normal $time REISUB "REISUB disabled" ""
+            ;;
+    esac
+}
+export -f Reisub
+
 UsefulTips() {
   local handle="$1"
   local tabnum="$2"
   local _and='&#38;'           # '&'
   local text="<b>$(ltr useful_tips_text)</b>"
+  local -r REISUB_PAGE="https://forum.endeavouros.com/t/tip-enable-magic-sysrq-key-reisub"
 
   ButtonsMayHide text
 
@@ -677,6 +696,8 @@ UsefulTips() {
   test "$(eos_GetArch)" != "armv7h" && tabcontents+=(--field=" $(ltr after_install_nv)!$ICO_INFO_WEB!$(ltr after_install_nvtip)":fbtn "WelcomeBrowser '$EOS_NVIDIA_INFO_PAGE'")
   tabcontents+=(
       --field=" $(ltr after_install_ft)!$ICO_INFO_WEB!$(ltr after_install_fttip)":fbtn     "WelcomeBrowser '$EOS_INCLUDE_LOGS_PAGE'"
+      --field=" $(ltr after_install_reisub)!$ICO_INFO_WEB!$(ltr after_install_reisubtip)":fbtn     "WelcomeBrowser '$REISUB_PAGE'"
+      --field=" $(ltr after_install_reisub2)!$ICO_INFO_WEB!$(ltr after_install_reisubtip)":fbtn    "Reisub --enable"
       --field=" EndeavourOS $_and ARM!$ICO_INFO_WEB!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "WelcomeBrowser $ARM_MAIN_PAGE"
       --field=" $(ltr butt_owncmds_help)!$ICO_INFO_WEB!$(ltr nb_tab_owncmdstip)":fbtn      "WelcomeBrowser $adding_own_commands"
       --field=" $(ltr butt_owncmds_dnd)!$ICO_SYSTOOLS!$(ltr butt_owncmds_dnd_help)":fbtn   "welcome-dnd"
