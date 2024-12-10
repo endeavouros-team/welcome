@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# button name | description or tip | url | icon (optional)
+
+WELCOME_TIP_PAGES=(
+    "$(ltr after_install_pm)|$(ltr after_install_pmtip)|'$EOS_PACKAGE_MGMT_URL'"
+    "$(ltr after_install_ay)|$(ltr after_install_aytip)|'$EOS_AUR_YAY_URL'"
+)
+
+WELCOME_TIP_PAGES+=(
+    "$(ltr after_install_hn)|$(ltr after_install_hntip)|'$EOS_HARDWARE_PAGE'"
+    "$(ltr after_install_bt)|$(ltr after_install_bttip)|'$BLUETOOTH_INFO_PAGE'"
+)
+
+if [ -x /usr/bin/firewalld ] ; then
+    WELCOME_TIP_PAGES+=( "$(ltr after_install_fw)|$(ltr after_install_fwtip)|'$EOS_FIREWALLD_INFO_PAGE'" )
+fi
+if [ "$(eos_GetArch)" != "armv7h" ] ; then
+    WELCOME_TIP_PAGES+=("$(ltr after_install_nv)|$(ltr after_install_nvtip)|'$EOS_NVIDIA_INFO_PAGE'")
+fi
+
+WELCOME_TIP_PAGES+=(
+    "$(ltr after_install_ft)|$(ltr after_install_fttip)|'$EOS_INCLUDE_LOGS_PAGE'"                       # Forum tips
+    "EndeavourOS $_and ARM|EndeavourOS $_and ARM $(ltr after_install_info)|'$ARM_MAIN_PAGE'"
+    "$(ltr arch_chroot)|$(ltr arch_chroot_tip)|'https://discovery.endeavouros.com/system-rescue/arch-chroot'"
+
+    "$(ltr after_install_reisub)|$(ltr after_install_reisubtip)|'$REISUB_PAGE'"
+    "$(ltr after_install_reisub2)|$(ltr after_install_reisubtip)|Reisub --enable|$ICO_CUSTOM"
+
+    "$(ltr butt_owncmds_help)|$(ltr nb_tab_owncmdstip)|$adding_own_commands"
+    "$(ltr butt_owncmds_dnd)|$(ltr butt_owncmds_dnd_help)|welcome-dnd|$ICO_SYSTOOLS"
+)

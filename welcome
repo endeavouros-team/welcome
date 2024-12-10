@@ -684,28 +684,32 @@ UsefulTips() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=$ICO_TIPS
       --text="$text"
-
-      --field=" $(ltr after_install_pm)!$ICO_INFO_WEB!$(ltr after_install_pmtip)":fbtn     "WelcomeBrowser $EOS_PACKAGE_MGMT_URL"
-      --field=" $(ltr after_install_ay)!$ICO_INFO_WEB!$(ltr after_install_aytip)":fbtn     "WelcomeBrowser '$EOS_AUR_YAY_URL'"
   )
-  if [ -x /usr/bin/firewalld ] ; then
-      tabcontents+=(--field=" $(ltr after_install_fw)!$ICO_INFO_WEB!$(ltr after_install_fwtip)":fbtn "WelcomeBrowser '$EOS_FIREWALLD_INFO_PAGE'")
-  fi
-  tabcontents+=(
-      --field=" $(ltr after_install_hn)!$ICO_INFO_WEB!$(ltr after_install_hntip)":fbtn      "WelcomeBrowser $EOS_HARDWARE_PAGE"
-      --field=" $(ltr after_install_bt)!$ICO_BLUETOOTH!$(ltr after_install_bttip)":fbtn     "WelcomeBrowser '$BLUETOOTH_INFO_PAGE'"
-  )
-  test "$(eos_GetArch)" != "armv7h" && tabcontents+=(--field=" $(ltr after_install_nv)!$ICO_INFO_WEB!$(ltr after_install_nvtip)":fbtn "WelcomeBrowser '$EOS_NVIDIA_INFO_PAGE'")
-  tabcontents+=(
-      --field=" $(ltr after_install_ft)!$ICO_INFO_WEB!$(ltr after_install_fttip)":fbtn     "WelcomeBrowser '$EOS_INCLUDE_LOGS_PAGE'"
-      --field=" $(ltr after_install_reisub)!$ICO_INFO_WEB!$(ltr after_install_reisubtip)":fbtn     "WelcomeBrowser '$REISUB_PAGE'"
-      --field=" $(ltr after_install_reisub2)!$ICO_INFO_WEB!$(ltr after_install_reisubtip)":fbtn    "Reisub --enable"
-      --field=" EndeavourOS $_and ARM!$ICO_INFO_WEB!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "WelcomeBrowser $ARM_MAIN_PAGE"
-      --field=" $(ltr butt_owncmds_help)!$ICO_INFO_WEB!$(ltr nb_tab_owncmdstip)":fbtn      "WelcomeBrowser $adding_own_commands"
-      --field=" $(ltr butt_owncmds_dnd)!$ICO_SYSTOOLS!$(ltr butt_owncmds_dnd_help)":fbtn   "welcome-dnd"
-  )
+  AddWelcomeTipPages
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
+}
+
+AddWelcomeTipPages() {
+    local WELCOME_TIP_PAGES=()
+    local -r file=/usr/share/endeavouros/scripts/welcome-tip-pages   # contains the WELCOME_TIP_PAGES array
+    source $file || return 1
+    local button tip url_or_command ico
+    local item                                       # button name | description or tip | url
+    for item in "${WELCOME_TIP_PAGES[@]}" ; do
+        ico=""
+        button="${item%%|*}"                                             ; item=${item#*|}
+        [ "$button" = "$item" ]         || tip="${item%%|*}"             ; item=${item#*|}
+        [ "$tip" = "$item" ]            || url_or_command="${item%%|*}"  ; item=${item#*|}
+        [ "$url_or_command" = "$item" ] || ico="${item%%|*}"             # ; item=${item#*|}
+
+        [ "$ico" ] || ico="$ICO_INFO_WEB"    # not all definitions include icon field
+
+        case "$ico" in
+            "$ICO_INFO_WEB") tabcontents+=(--field=" $button!$ico!$tip":fbtn  "WelcomeBrowser '$url_or_command'") ;;
+            *)               tabcontents+=(--field=" $button!$ico!$tip":fbtn  "$url_or_command")
+        esac
+    done
 }
 
 AddMoreApps() {
