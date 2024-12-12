@@ -1587,6 +1587,8 @@ StartHere() {
     [ -n "$EOS_AUR_HELPER_OTHER" ] && export EOS_AUR_HELPER_OTHER
     export WELCOME_ARGS="$*"
 
+    SetBrowser
+
     HandleOptions1 "$@"
 
     if [ "$is_installing" = "no" ] && [ -z "$lang" ] ; then
@@ -1688,8 +1690,6 @@ StartHere() {
             fi
         fi
     fi
-
-    SetBrowser
 
     local handle="$(shuf -i 700000-999999 -n 1)"
     local tab tabname
