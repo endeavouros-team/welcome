@@ -302,9 +302,7 @@ INSTALL() {
       # --field=" $(ltr install_community)!$ICO_INSTALL!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
       # --field=" $(ltr ins_arm_start)!$ICO_INSTALL_ARM!$(ltr ins_arm_starttip)":fbtn    "arm-eos-welcome-installer"
   )
-  if [ "$has_a_connection" = "yes" ] ; then
-      MirrorRankingButtons
-  fi
+  [ "$has_a_connection" = "yes" ] && MirrorRankingButtons
 
   IsInstalled partitionmanager && tabcontents+=(--field=" $(ltr ins_pm) (partitionmanager)!$ICO_PARTITIONMANAGER!$(ltr ins_pmtip2)":fbtn 'partitionmanager')
   IsInstalled gparted          && tabcontents+=(--field=" $(ltr ins_pm) (gparted)!$ICO_GPARTED!$(ltr ins_pmtip)":fbtn 'gparted')
@@ -889,6 +887,7 @@ WelcomeHelp_opt() {
                     --text="<b>$WH_BUTT_TEXT</b>" \
                     --text-align=left \
                     --image=$ICO_HELP --button=yad-ok:0
+    [ "$1" ] && exit $1
 }
 WelcomeHelp() {
     WelcomeBrowser "$EOS_WELCOME_PAGE"
@@ -1402,9 +1401,66 @@ LanguageSelectionButton() {
     notebook+=(--button=" Change Language!$ico!Select another supported language for Welcome":"LanguageSelection")
 }
 
+IncludesOption() {
+    local option="$1"
+    shift
+    printf "%s\n" "$@" | grep "^$option$" >/dev/null
+}
+
+HandleOptions1() {
+    local opts
+    opts="$(/usr/bin/getopt -o="$SOPTS" --longoptions "$LOPTS" --name "$PROGNAME" -- "$@")" || WelcomeHelp_opt 1
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            --)                    shift; break ;;
+            --changelog)           WelcomeChangelog; exit ;;
+            --lang | -l)           lang="$2"; shift ;;
+            --tr-engine)           tr_engine="$2"; shift ;;
+            --tr-prefer)           tr_prefer="$2"; shift ;;
+            --id)                  MagicId "$2" && shift || exit 0 ;;
+            --ni)                  MagicId_new "$2" && shift || exit 0 ;;
+            --genlang)             lang="$2"
+                                   shift
+                                   LangImplConvert
+                                   _init_translations --tr-engine="$tr_engine" --generate "$lang"
+                                   exit $?
+                                   ;;
+        esac
+        shift
+    done
+}
+HandleOptions2() {
+    local opts
+    opts="$(/usr/bin/getopt -o="$SOPTS" --longoptions "$LOPTS" --name "$PROGNAME" -- "$@")" || WelcomeHelp_opt 1
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            --)             shift; break ;;
+            --disable)      WelcomeSettings disable ; exit ;;
+            --enable|-f)    WelcomeSettings enable ;;
+            --help|-h)      WelcomeHelp_opt 0 ;;
+            --once | -1)    allow_run_if_disabled=yes ;;
+            --startdelay)   start_delay="$2"; shift ;;
+            --testing)      testing=yes ;;
+            --version)      echo "$PROG_VERSION" >&2 ; exit ;;
+
+            --changelog | --genlang | --installer | --verboselog) ;;            # already handled
+            --id | --lang | -l | --ni | --tr-engine | --tr-prefer) shift ;;     # already handled
+        esac
+        shift
+    done
+    [ "$1" ] && DIE "unsupported parameter '$1'"
+}
+
 StartHere() {
     eos_assert_deps $PROGNAME yad || return 1
     BreakPoint
+
+    local -r LOPTS="changelog,lang:,tr-engine:,tr-prefer:,id:,ni:,verboselog,genlang:,help,enable,disable,once,startdelay:,version,testing,installer"
+    local -r SOPTS="1fhl:"
 
     local arg lang=""
     local yad_zombie_log=/tmp/yad-zombies.log
@@ -1424,21 +1480,14 @@ StartHere() {
 
     source /etc/welcome-installer.conf || DIE "file /etc/welcome-installer.conf not found"
 
-    for arg in "$@" ; do
-        case "$arg" in
-            --verboselog) export WELCOME_VERBOSE_LOG=yes ;;
-        esac
-    done
+    IncludesOption --verboselog "$@" && export WELCOME_VERBOSE_LOG=yes
 
     GetCurrentDesktop CurrentDesktop
     AssignIconVariables
 
     export show_installer=no    # explicitly show the installer, for testing only
-    for arg in "$@" ; do
-        case "$arg" in
-            --installer) export show_installer=yes ;;
-        esac
-    done
+
+    IncludesOption --installer "$@" && export show_installer=yes
 
     local install_mode=""
     local is_installing=no
@@ -1538,26 +1587,8 @@ StartHere() {
     [ -n "$EOS_AUR_HELPER_OTHER" ] && export EOS_AUR_HELPER_OTHER
     export WELCOME_ARGS="$*"
 
-    for arg in "$@" ; do
-        case "$arg" in
-            --changelog)
-                WelcomeChangelog
-                return
-                ;;
-            --lang=*) lang="${arg#*=}" ;;
-            --tr-engine=*) tr_engine="${arg#*=}" ;;
-            --tr-prefer=*) tr_prefer="${arg#*=}" ;;
-            --id=*) MagicId "${arg#*=}" || return 0 ;;
-            --ni=*) MagicId_new "${arg#*=}" || return 0 ;;
-            --verboselog) ;;
-            --genlang=*)
-                lang="${arg#*=}"
-                LangImplConvert
-                _init_translations --tr-engine="$tr_engine" --generate "$lang"
-                return
-                ;;
-        esac
-    done
+    HandleOptions1 "$@"
+
     if [ "$is_installing" = "no" ] && [ -z "$lang" ] ; then
         lang="$LANG"
     fi
@@ -1582,12 +1613,10 @@ StartHere() {
         fi
     fi
 
-    if [ -r "$welcome_configurator" ] ; then
-        source "$welcome_configurator"
-    fi
-    if [ -z "$EOS_WELCOME_ACTIVE_TAB_NUMBER" ] ; then
-        EOS_WELCOME_ACTIVE_TAB_NUMBER=2
-    fi
+    [ -r "$welcome_configurator" ] && source "$welcome_configurator"
+
+    [ "$EOS_WELCOME_ACTIVE_TAB_NUMBER" ] || EOS_WELCOME_ACTIVE_TAB_NUMBER=2
+
     export EOS_WELCOME_ACTIVE_TAB_NUMBER
 
     export user_pkglist_url=""
@@ -1598,34 +1627,16 @@ StartHere() {
         [ -n "$ISO_VERSION" ] && _NOTEBOOK_TITLE+="  [$(GetIsoDateStr)]"
     fi
 
-    for arg in "$@" ; do
-        case "$arg" in
-            --help|-h) WelcomeHelp_opt ; return ;;
-            --enable|-f) WelcomeSettings enable ;;
-            --disable)   WelcomeSettings disable ; return ;;
-            --once | -1) allow_run_if_disabled=yes ;;
-            --startdelay=*) start_delay="${arg#*=}" ;;
-            --installer) ;;                                             # already handled!
-            --verboselog) ;;                                             # already handled!
-            --version) echo "$PROG_VERSION" >&2 ; return ;;
-            --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --ni=*) ;; # already handled!
-            --testing) testing=yes ;;
-            -*) DIE "unsupported option '$arg'" ;;
-            *)  DIE "unsupported parameter '$arg'" ;;
-        esac
-    done
+    HandleOptions2 "$@"
+
     export WELCOME_LANG="$lang"
 
-    if [ "$(WelcomeSettings continue)" = "no" ] ; then
-        return
-    fi
+    [ "$(WelcomeSettings continue)" = "no" ] && return
 
     local adding_own_commands=$(Github2Gitlab $WELCOME_ADD_COMMANDS_INFO)
     local own_commands_conf="$HOME/.config/welcome-own-cmds.conf"
 
-    if [ -r    "$own_commands_conf" ] ; then
-        source "$own_commands_conf"
-    fi
+    [ -r    "$own_commands_conf" ] && source "$own_commands_conf"
 
     CreateNotebookCommands
 
@@ -1640,9 +1651,7 @@ StartHere() {
         R8168check_at_install
     fi
 
-    if [ "$start_delay" != "0" ] ; then
-        sleep "$start_delay"
-    fi
+    [ "$start_delay" != "0" ] && sleep "$start_delay"
 
     if [ "$is_installing" = "no" ] ; then
         local verbosity
@@ -1663,9 +1672,8 @@ StartHere() {
             }
         fi
     else
-        if [ "$has_a_connection" = "yes" ] ; then
-            eos-kbd-set
-        fi
+        [ "$has_a_connection" = "yes" ] && eos-kbd-set
+
         if [ -x /usr/bin/numlockx ] ; then
             # some laptops have number pad inside the normal keyboard, so set NumLock off
             numlockx on  # show we are adjusting numlock...
@@ -1737,9 +1745,7 @@ StartHere() {
     fi
     notebook+=(--active-tab=$active_tab_nr)
 
-    if [ "$is_installing" = "yes" ] ; then
-        LanguageSelectionButton
-    fi
+    [ "$is_installing" = "yes" ] && LanguageSelectionButton
 
     notebook+=(--button=" $(ltr butt_softnews)!$ICO_NEWS!$(ltr butt_softnews_tip)":"ImportantNews")
     notebook+=(--button=" $(ltr butt_changelog)!$ICO_CHANGES!$(ltr butt_changelogtip)":"WelcomeChangelog")
