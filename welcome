@@ -247,12 +247,18 @@ ShowChangeResoButton() {
 }
 export -f ShowChangeResoButton
 
-RateMirrors() {
-    local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
-    [ -n "$delay" ] || delay=3600
-    RunInTerminal "rate-mirrors --save /tmp/mirrorlist arch --max-delay=$delay && sudo cp /tmp/mirrorlist /etc/pacman.d/"
+RateMirrorsCmd() {
+    local cmd=""
+    if [ "$WELCOME_RATE_MIRRORS_COMMAND" ] ; then
+        cmd="$WELCOME_RATE_MIRRORS_COMMAND"
+    else
+        local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
+        [ "$delay" ] || delay=3600
+        cmd="rate-mirrors arch --max-delay=$delay | sudo tee /etc/pacman.d/mirrorlist"
+    fi
+    RunInTerminal "$cmd"
 }
-export -f RateMirrors
+export -f RateMirrorsCmd
 
 MirrorRankingButtons() {
     if [ "$(eos_GetArch)" != "armv7h" ] ; then
@@ -263,7 +269,7 @@ MirrorRankingButtons() {
         fi
         if [ -x /usr/bin/rate-mirrors ] ; then
             tabcontents+=(
-                --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrors"
+                --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrorsCmd"
             )
         fi
     fi
