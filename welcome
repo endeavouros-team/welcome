@@ -1695,6 +1695,13 @@ StartHere() {
                 Welog "Warning: cannot make a backup of mirrorlist!"
             fi
         fi
+        if [ ! -r /tmp/endeavouros-mirrorlist.bu ] ; then
+            if [ -r /etc/pacman.d/endeavouros-mirrorlist ] ; then
+                cp /etc/pacman.d/endeavouros-mirrorlist /tmp/endeavouros-mirrorlist.bu  # to be checked by update-mirrorlist
+            else
+                Welog "Warning: cannot make a backup of endeavouros-mirrorlist!"
+            fi
+        fi
     fi
 
     local handle="$(shuf -i 700000-999999 -n 1)"
