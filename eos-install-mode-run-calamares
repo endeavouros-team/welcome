@@ -232,6 +232,18 @@ InstallWithLogs() {
 }
 
 run_hotfix_start() {
+    if sudo pacman -Sy --noconfirm eos-iso-hotfix &>/dev/null ; then
+        # NEW system for hotfixes, uses files in package eos-iso-hotfix.
+        [ -e /usr/share/endeavouros/hotfix/modules/* ] && sudo cp /usr/share/endeavouros/hotfix/modules/* /etc/calamares/modules/
+        [ -e /usr/share/endeavouros/hotfix/scripts/* ] && sudo cp /usr/share/endeavouros/hotfix/scripts/* /etc/calamares/scripts/
+
+        sudo bash /usr/share/endeavouros/hotfix/hotfixes/hotfix-start.bash
+
+        # Note: calamares must copy some hotfix files (e.g. hotfix-end.bash) to folder /tmp of the chrooted target!
+
+        PreLog "File hotfix-start.bash from package eos-iso-hotfix executed."
+        return
+    fi
     local file=${HOTFIX_START_FILE##*/}   # file=hotfix-start.bash
     local url=$(eos-github2gitlab $HOTFIX_START_FILE)
 
