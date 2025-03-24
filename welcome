@@ -272,6 +272,14 @@ MirrorRankingButtons() {
                 --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrorsCmd"
             )
         fi
+        if [ -x /usr/bin/rami ] ; then
+            if [ -z "$WELCOME_RAMI_OPTIONS" ] ; then
+                WELCOME_RAMI_OPTIONS="--save --timeout-rank 10 --ranking-data --continent -cDE,US"
+            fi
+            tabcontents+=(
+                --field=" $(ltr after_install_um) (Arch, rami)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RunInTerminal '/bin/rami $WELCOME_RAMI_OPTIONS'"
+            )
+        fi
     fi
     if [ -x /usr/bin/eos-rankmirrors ] ; then
         tabcontents+=(
