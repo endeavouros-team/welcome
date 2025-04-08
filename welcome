@@ -8,7 +8,7 @@
 # TODO:
 # - add icons to buttons once proper supported exists in yad
 
-BreakPoint() { : ; }
+DebugBreak() { : ; }
 
 export PROGNAME=eos-welcome
 export PRETTY_PROGNAME="Welcome"
@@ -1471,7 +1471,7 @@ HandleOptions2() {
 
 StartHere() {
     eos_assert_deps $PROGNAME yad || return 1
-    BreakPoint
+    DebugBreak
 
     local -r LOPTS="changelog,lang:,tr-engine:,tr-prefer:,id:,ni:,verboselog,genlang:,help,enable,disable,once,startdelay:,version,testing,installer"
     local -r SOPTS="1fhl:"
@@ -1610,7 +1610,7 @@ StartHere() {
     fi
     LangImplConvert
 
-    BreakPoint
+    DebugBreak
 
     _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
 
@@ -1724,7 +1724,7 @@ StartHere() {
     notebook+=(--use-interp)
     notebook+=(--expand)
 
-    BreakPoint
+    DebugBreak
 
     if [ "$is_installing" = "no" ] ; then
         # Try to give a critical notification.
