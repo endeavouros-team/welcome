@@ -424,11 +424,11 @@ export -f UpdateWithEosAurHelper
 
 AddEosAurHelpers() {
     # Add plain eos-update
-    tabcontents+=(--field=" $(ltr after_install_usnat) (eos-update)!$ICO_UPDATE!$(ltr after_install_usnat_tip)":fbtn "UpdateWithEosAurHelper 'eos-update'")
+    tabcontents+=(--field=" $(ltr after_install_usnat) (eos-update)!$ICO_UPDATE!$(ltr after_install_usnat_tip)":fbtn "UpdateWithEosAurHelper 'eos-update --faillock-check'")
 
     # Add eos-update --aur if a supported helper is installed
     if [ -x /bin/yay ] || [ -x /bin/paru ] ; then
-        tabcontents+=(--field=" $(ltr after_install_usnataur) (eos-update --aur)!$ICO_UPDATE!$(ltr after_install_usnataur_tip)":fbtn "UpdateWithEosAurHelper 'eos-update --aur'")
+        tabcontents+=(--field=" $(ltr after_install_usnataur) (eos-update --aur)!$ICO_UPDATE!$(ltr after_install_usnataur_tip)":fbtn "UpdateWithEosAurHelper 'eos-update --faillock-check --aur'")
     fi
 
     # Add simply the first existing AUR helper
