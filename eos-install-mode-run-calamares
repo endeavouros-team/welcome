@@ -241,7 +241,8 @@ run_hotfix_start() {
 
         # Note: calamares must copy some hotfix files (e.g. hotfix-end.bash) to folder /tmp of the chrooted target!
 
-        PreLog "File hotfix-start.bash from package eos-iso-hotfix executed."
+        local version=$(expac %v eos-iso-hotfix)
+        PreLog "File hotfix-start.bash from package eos-iso-hotfix $version executed."
         return
     fi
     local file=${HOTFIX_START_FILE##*/}   # file=hotfix-start.bash
