@@ -283,7 +283,7 @@ MirrorRankingButtons() {
     fi
     if [ -x /usr/bin/eos-rankmirrors ] ; then
         tabcontents+=(
-            --field=" $(ltr after_install_um) (EndeavourOS)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal eos-rankmirrors"
+            --field=" $(ltr after_install_um) (EndeavourOS)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal 'LANG=C eos-rankmirrors'"
         )
     fi
 }
