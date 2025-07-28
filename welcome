@@ -607,8 +607,15 @@ DailyAssistant() {
   )
 
   if [ -n "$CurrentDesktop" ] ; then
+      local dname
+      case "$CurrentDesktop" in
+          kde|mate|lxde|gnome)  dname=${CurrentDesktop^^} ;; # KDE_Plasma?
+          xfce|cinnamon|budgie) dname=${CurrentDesktop^} ;;  # Xfce ;;
+          lxqt)                 dname=LXQt ;;
+          *)                    dname="$CurrentDesktop" ;;
+      esac
       tabcontents+=(
-          --field=" ${CurrentDesktop^^}: $(ltr daily_assist_DEinfo)!$ICO_INFO_WEB!$CurrentDesktop: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$CurrentDesktop"
+          --field=" $dname: $(ltr daily_assist_DEinfo)!$ICO_INFO_WEB!$CurrentDesktop: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$dname"
       )
   fi
 
