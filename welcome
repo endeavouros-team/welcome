@@ -463,6 +463,13 @@ AfterInstall() {
       --text="$text" --columns=2
   )
   MirrorRankingButtons
+
+  if [ -x /bin/eos-manual-intervention ] ; then
+      if [ $(eos-manual-intervention --count) -gt 0 ] ; then
+          tabcontents+=(--field=" $(ltr after_install_mani)!$ICO_UPDATE!$(ltr after_install_manitip)":fbtn "RunInTerminal eos-manual-intervention")
+      fi
+  fi
+
   AddEosAurHelpers
   tabcontents+=(
       #--field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$ICO_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"     # "RunInTerminal UpdateInTerminal --lang=$lang"
