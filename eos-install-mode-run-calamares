@@ -280,7 +280,7 @@ CheckUserPkglist() {
         local txt=""
 
         # allow only one pkgname per line
-        readarray -t user_pkgs <<< $(echo "$user_pkgs")
+        readarray -t user_pkgs < <(echo "$user_pkgs")
 
         for up in "${user_pkgs[@]}" ; do
             [ -n "$up" ] || continue
