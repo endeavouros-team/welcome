@@ -224,6 +224,15 @@ WelcomeDevelConf() {
 }
 export -f WelcomeDevelConf
 
+AddField2() {    # Still experimental!
+    [ $NewFieldHandling = yes ] || return 1
+    local app="$1"
+    shift
+    if [ -z "$app" ] || which "$app" &>/dev/null ; then
+        tabcontents+=(--field=" $@")
+    fi
+}
+
 ShowChangeResoButton() {
     # Allow showing a button for changing the display resolution?
 
@@ -242,23 +251,38 @@ ShowChangeResoButton() {
     fi
 
     if [ "$show_reso_butt" = "yes" ] ; then
+        # AddField2 "" "$(ltr ins_reso)!$ICO_PREFERENCES_DISPLAY!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution
         tabcontents+=(--field=" $(ltr ins_reso)!$ICO_PREFERENCES_DISPLAY!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
     fi
 }
 export -f ShowChangeResoButton
 
-RateMirrorsCmd() {
+RateMirrors_arch_old() {
     local cmd=""
     if [ "$WELCOME_RATE_MIRRORS_COMMAND" ] ; then
         cmd="$WELCOME_RATE_MIRRORS_COMMAND"
     else
         local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
         [ "$delay" ] || delay=3600
-        cmd="rate-mirrors arch --max-delay=$delay | sudo tee /etc/pacman.d/mirrorlist"
+        cmd="/bin/rate-mirrors arch --max-delay=$delay | sudo tee /etc/pacman.d/mirrorlist"
     fi
     RunInTerminal "$cmd"
 }
-export -f RateMirrorsCmd
+RateMirrors_arch() {
+    local tmpfile=$(mktemp)
+    local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
+    [ "$delay" ] || delay=3600
+    chmod go-rwx $tmpfile
+    RunInTerminal "/bin/rate-mirrors --save '$tmpfile' --disable-comments-in-file arch --max-delay=$delay ; sudo cp '$tmpfile' /etc/pacman.d/mirrorlist ; rm -f '$tmpfile'"
+}
+RateMirrors_eos() {
+    local tmpfile=$(mktemp)
+    chmod go-rwx $tmpfile
+    RunInTerminal "/bin/rate-mirrors --save '$tmpfile' --disable-comments-in-file endeavouros ; sudo cp '$tmpfile' /etc/pacman.d/endeavouros-mirrorlist ; rm -f '$tmpfile'"
+}
+
+export -f RateMirrors_eos
+export -f RateMirrors_arch
 
 MirrorRankingButtons() {
     if [ "$(eos_GetArch)" != "armv7h" ] ; then
@@ -266,11 +290,13 @@ MirrorRankingButtons() {
             tabcontents+=(
                 --field=" $(ltr after_install_um) (Arch, reflector-simple)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "reflector-simple"
             )
+            # AddField2 reflector-simple "$(ltr after_install_um) (Arch, reflector-simple)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "reflector-simple"
         fi
         if [ -x /usr/bin/rate-mirrors ] ; then
             tabcontents+=(
-                --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrorsCmd"
+                --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrors_arch"
             )
+            # AddField2 rate-mirrors "$(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrors_arch"
         fi
         if [ -x /usr/bin/rami ] ; then
             if [ -z "$WELCOME_RAMI_OPTIONS" ] ; then
@@ -279,12 +305,16 @@ MirrorRankingButtons() {
             tabcontents+=(
                 --field=" $(ltr after_install_um) (Arch, rami)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RunInTerminal '/bin/rami $WELCOME_RAMI_OPTIONS'"
             )
+            # AddField2 "" "$(ltr after_install_um) (Arch, rami)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RunInTerminal '/bin/rami $WELCOME_RAMI_OPTIONS'"
         fi
     fi
     if [ -x /usr/bin/eos-rankmirrors ] ; then
         tabcontents+=(
-            --field=" $(ltr after_install_um) (EndeavourOS)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal 'LANG=C eos-rankmirrors'"
+            --field=" $(ltr after_install_um) (EndeavourOS, eos-rankmirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal 'LANG=C eos-rankmirrors'"
+            --field=" $(ltr after_install_um) (EndeavourOS, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn    "RateMirrors_eos"
         )
+        # AddField2 eos-rankmirrors "$(ltr after_install_um) (EndeavourOS, eos-rankmirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal 'LANG=C eos-rankmirrors'"
+        # AddField2 rate-mirrors    "$(ltr after_install_um) (EndeavourOS, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn    "RateMirrors_eos"
     fi
 }
 export -f MirrorRankingButtons
@@ -1505,6 +1535,8 @@ StartHere() {
     local has_a_connection=no
     local ISO_VERSION=""                      # only for the installer
     local CurrentDesktop=""
+
+    export NewFieldHandling=yes
 
     source /etc/welcome-installer.conf || DIE "file /etc/welcome-installer.conf not found"
 
