@@ -264,7 +264,7 @@ RateMirrors_arch_old() {
     else
         local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
         [ "$delay" ] || delay=3600
-        cmd="/bin/rate-mirrors arch --max-delay=$delay | sudo tee /etc/pacman.d/mirrorlist"
+        cmd="/usr/bin/rate-mirrors arch --max-delay=$delay | sudo tee /etc/pacman.d/mirrorlist"
     fi
     RunInTerminal "$cmd"
 }
@@ -273,18 +273,21 @@ RateMirrors_arch() {
     local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
     [ "$delay" ] || delay=3600
     chmod go-rwx $tmpfile
-    RunInTerminal "/bin/rate-mirrors --save '$tmpfile' --disable-comments-in-file arch --max-delay=$delay ; sudo cp '$tmpfile' /etc/pacman.d/mirrorlist ; rm -f '$tmpfile'"
+    RunInTerminal "/usr/bin/rate-mirrors --save '$tmpfile' --disable-comments-in-file arch --max-delay=$delay ; sudo cp '$tmpfile' /etc/pacman.d/mirrorlist ; rm -f '$tmpfile'"
 }
 RateMirrors_eos() {
     local tmpfile=$(mktemp)
     chmod go-rwx $tmpfile
-    RunInTerminal "/bin/rate-mirrors --save '$tmpfile' --disable-comments-in-file endeavouros ; sudo cp '$tmpfile' /etc/pacman.d/endeavouros-mirrorlist ; rm -f '$tmpfile'"
+    RunInTerminal "/usr/bin/rate-mirrors --save '$tmpfile' --disable-comments-in-file endeavouros ; sudo cp '$tmpfile' /etc/pacman.d/endeavouros-mirrorlist ; rm -f '$tmpfile'"
 }
 
 export -f RateMirrors_eos
 export -f RateMirrors_arch
 
 MirrorRankingButtons() {
+    local has_ratemirrors=no
+    [ -x /usr/bin/rate-mirrors ] && has_ratemirrors=yes
+
     if [ "$(eos_GetArch)" != "armv7h" ] ; then
         if [ -x /usr/bin/reflector-simple ] ; then
             tabcontents+=(
@@ -292,7 +295,7 @@ MirrorRankingButtons() {
             )
             # AddField2 reflector-simple "$(ltr after_install_um) (Arch, reflector-simple)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "reflector-simple"
         fi
-        if [ -x /usr/bin/rate-mirrors ] ; then
+        if [ $has_ratemirrors = yes ] ; then
             tabcontents+=(
                 --field=" $(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrors_arch"
             )
@@ -311,11 +314,15 @@ MirrorRankingButtons() {
     if [ -x /usr/bin/eos-rankmirrors ] ; then
         tabcontents+=(
             --field=" $(ltr after_install_um) (EndeavourOS, eos-rankmirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal 'LANG=C eos-rankmirrors'"
-            --field=" $(ltr after_install_um) (EndeavourOS, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn    "RateMirrors_eos"
         )
-        # AddField2 eos-rankmirrors "$(ltr after_install_um) (EndeavourOS, eos-rankmirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal 'LANG=C eos-rankmirrors'"
-        # AddField2 rate-mirrors    "$(ltr after_install_um) (EndeavourOS, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn    "RateMirrors_eos"
     fi
+    if [ $has_ratemirrors = yes ] ; then
+        tabcontents+=(
+            --field=" $(ltr after_install_um) (EndeavourOS, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn  "RateMirrors_eos"
+        )
+    fi
+    # AddField2 eos-rankmirrors "$(ltr after_install_um) (EndeavourOS, eos-rankmirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn "RunInTerminal 'LANG=C eos-rankmirrors'"
+    # AddField2 rate-mirrors    "$(ltr after_install_um) (EndeavourOS, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umentip)":fbtn    "RateMirrors_eos"
 }
 export -f MirrorRankingButtons
 
