@@ -88,7 +88,7 @@ LogHeader() {
 ########## Calamares version: $calamares_version
 EOF
     inxi_output
-    os-prober_output
+    # os-prober_output
 }
 
 PreliminaryLogFile() {
@@ -192,13 +192,14 @@ PleaseWait() {
     case "$1" in
         start)
             eos_yad --form --width=250 --title="$(ltr ins_start_calamares)" --text="$(ltr ins_please_wait)" --image=$ICO_CALAMARES --no-buttons &
+            sleep 1
             waitpid=$(ps -ef | grep -wv grep | grep "\--no-buttons" | awk '{print $2}')
             ;;
         stop)
             while ! ps -C calamares ; do
                 sleep 1
             done
-            sleep 3
+            sleep 1
             sudo kill $waitpid
             ;;
     esac
@@ -206,10 +207,6 @@ PleaseWait() {
 
 ### Starts the calamares installer process and logging. ###
 InstallWithLogs() {
-    local waitpid=""
-
-    PleaseWait start
-
     InstallLog_Start
     Calamares_Start
 
@@ -326,6 +323,7 @@ Main() {
         /usr/share/endeavouros/scripts/eos-script-lib-yad
         /etc/welcome-installer.conf
     )
+    local waitpid=""
     local testing=no
 
     case "$1" in
@@ -377,6 +375,8 @@ Main() {
     case "$mode" in
         "" | test) AskMode ;;    # ask the value for $mode
     esac
+
+    PleaseWait start
 
     if [ $has_connection = yes ] && [ "$mode" != "offline" ] ; then
         [ $testing = no ] && run_hotfix_start                                    # run possible hotfixes before copying settings.conf file
