@@ -369,6 +369,7 @@ INSTALL() {
           --field=" $(ltr ins_customized)!$ICO_CUSTOM!$(ltr ins_cust_text)":fbtn          "AskUserCustomUrl"
       )
   fi
+  TesterIsoFetching
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
@@ -605,6 +606,16 @@ PacdiffIcon() {
     done
 }
 
+TesterIsoFetching() {
+    # for the ISO testers
+    if [ $IsIsoTesting = yes ] || pacman -Q fetch-iso &>/dev/null ; then
+        IsIsoTesting=yes
+        tabcontents+=(
+            --field=" Fetch a tester ISO!$ICO_INFO_WEB!For ISO testers only":fbtn   "RunInTerminal fetch-iso"
+        )
+    fi
+}
+
 DailyAssistant() {
   local handle="$1"
   local tabnum="$2"
@@ -662,6 +673,7 @@ DailyAssistant() {
           --field=" $dname: $(ltr daily_assist_DEinfo)!$ICO_INFO_WEB!$CurrentDesktop: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$dname"
       )
   fi
+  TesterIsoFetching
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
@@ -1542,6 +1554,7 @@ StartHere() {
     local has_a_connection=no
     local ISO_VERSION=""                      # only for the installer
     local CurrentDesktop=""
+    local IsIsoTesting=no
 
     export NewFieldHandling=yes
 
