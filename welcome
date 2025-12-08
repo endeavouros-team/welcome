@@ -257,28 +257,23 @@ ShowChangeResoButton() {
 }
 export -f ShowChangeResoButton
 
-RateMirrors_arch_old() {
-    local cmd=""
-    if [ "$WELCOME_RATE_MIRRORS_COMMAND" ] ; then
-        cmd="$WELCOME_RATE_MIRRORS_COMMAND"
-    else
-        local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
-        [ "$delay" ] || delay=3600
-        cmd="/usr/bin/rate-mirrors arch --max-delay=$delay | sudo tee /etc/pacman.d/mirrorlist"
-    fi
-    RunInTerminal "$cmd"
-}
 RateMirrors_arch() {
     local tmpfile=$(mktemp)
     local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
     [ "$delay" ] || delay=3600
     chmod go-rwx $tmpfile
-    RunInTerminal "/usr/bin/rate-mirrors --save '$tmpfile' --disable-comments-in-file arch --max-delay=$delay ; sudo cp '$tmpfile' /etc/pacman.d/mirrorlist ; rm -f '$tmpfile'"
+    local cmd="/usr/bin/rate-mirrors --save $tmpfile --disable-comments-in-file arch --max-delay=$delay"
+          cmd+="; [ "$(stat -c %s $tmpfile)" -gt 10 ] && sudo cp $tmpfile /etc/pacman.d/mirrorlist"
+          cmd+="; sleep 1; rm -f $tmpfile"
+    RunInTerminal "$cmd"
 }
 RateMirrors_eos() {
     local tmpfile=$(mktemp)
     chmod go-rwx $tmpfile
-    RunInTerminal "/usr/bin/rate-mirrors --save '$tmpfile' --disable-comments-in-file endeavouros ; sudo cp '$tmpfile' /etc/pacman.d/endeavouros-mirrorlist ; rm -f '$tmpfile'"
+    local cmd="/usr/bin/rate-mirrors --save $tmpfile --disable-comments-in-file endeavouros"
+          cmd+="; [ "$(stat -c %s $tmpfile)" -gt 10 ] && sudo cp $tmpfile /etc/pacman.d/endeavouros-mirrorlist"
+          cmd+="; sleep 1; rm -f $tmpfile"
+    RunInTerminal "$cmd"
 }
 
 export -f RateMirrors_eos
