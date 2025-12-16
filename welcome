@@ -258,20 +258,20 @@ ShowChangeResoButton() {
 export -f ShowChangeResoButton
 
 RateMirrors_arch() {
-    local tmpfile=$(mktemp)
+    local tmpfile=$(mktemp -u)
     local delay="$RATE_MIRRORS_MAX_DELAY_ARCH"
     [ "$delay" ] || delay=3600
     chmod go-rwx $tmpfile
     local cmd="/usr/bin/rate-mirrors --save $tmpfile --disable-comments-in-file arch --max-delay=$delay"
-          cmd+="; [ "$(stat -c %s $tmpfile)" -gt 10 ] && sudo cp $tmpfile /etc/pacman.d/mirrorlist"
+          cmd+="; [ -e $tmpfile ] && sudo cp $tmpfile /etc/pacman.d/mirrorlist"
           cmd+="; sleep 1; rm -f $tmpfile"
     RunInTerminal "$cmd"
 }
 RateMirrors_eos() {
-    local tmpfile=$(mktemp)
+    local tmpfile=$(mktemp -u)
     chmod go-rwx $tmpfile
     local cmd="/usr/bin/rate-mirrors --save $tmpfile --disable-comments-in-file endeavouros"
-          cmd+="; [ "$(stat -c %s $tmpfile)" -gt 10 ] && sudo cp $tmpfile /etc/pacman.d/endeavouros-mirrorlist"
+          cmd+="; [ -e $tmpfile ] && sudo cp $tmpfile /etc/pacman.d/endeavouros-mirrorlist"
           cmd+="; sleep 1; rm -f $tmpfile"
     RunInTerminal "$cmd"
 }
