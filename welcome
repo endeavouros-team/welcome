@@ -1751,7 +1751,7 @@ StartHere() {
     else
         [ "$has_a_connection" = "yes" ] && eos-kbd-set
 
-        if [ -x /usr/bin/numlockx ] ; then
+        if [ "$XDG_SESSION_TYPE" = x11 ] && [ -x /usr/bin/numlockx ] ; then
             # some laptops have number pad inside the normal keyboard, so set NumLock off
             numlockx on  # show we are adjusting numlock...
             sleep 1
