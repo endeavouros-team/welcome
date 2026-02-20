@@ -1790,15 +1790,19 @@ StartHere() {
     if [ "$is_installing" = "no" ] ; then
         # Try to give a critical notification.
         #
-        # File 'do_notify' can contain one or more date defs, one per line. Ignored lines:
+        # File 'do_notify' contains one or more date defs, one per line in ascending order.
+        # Ignored lines:
         #   - comment lines (first non-white char is #)
         #   - empty lines (contain only white spaces)
         #
         local news_date_url="$(Github2Gitlab https://raw.githubusercontent.com/endeavouros-team/Important-news/main/do_notify)"
-        local news_date=""
-        news_date="$(curl --fail -Lsm 10 -o- $news_date_url | grep -Pv "^[ \t]*#|^[ \t]*$")"
-        if [ "$news_date" ] ; then
-            notebook+=(--text="$(ltr nb_notify_user1)\n$news_date\n$(ltr nb_notify_user2) <b>$(ltr butt_softnews)</b> $(ltr nb_notify_user3)\n")
+        local news_dates="" latest_date=""
+        local latest_welcome_news_date_file="$HOME/.config/welcome_news_latest_date_file"
+        news_dates="$(curl --fail -Lsm 10 -o- $news_date_url | grep -Pv "^[ \t]*#|^[ \t]*$")"
+        latest_date=$(echo "$news_dates" | tail -n1)
+        if [ "$latest_date" ] && [ "$latest_date" != "$(cat "$latest_welcome_news_date_file" 2>/dev/null)" ] ; then
+           echo "$latest_date" > "$latest_welcome_news_date_file"
+           notebook+=(--text="$(ltr nb_notify_user1)\n$news_dates\n$(ltr nb_notify_user2) <b>$(ltr butt_softnews)</b> $(ltr nb_notify_user3)\n")
         fi
     fi
 
