@@ -296,15 +296,23 @@ MirrorRankingButtons() {
             )
             # AddField2 rate-mirrors "$(ltr after_install_um) (Arch, rate-mirrors)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RateMirrors_arch"
         fi
-        if [ -x /usr/bin/rami ] ; then
-            if [ -z "$WELCOME_RAMI_OPTIONS" ] ; then
-                WELCOME_RAMI_OPTIONS="--save --timeout-rank 10 --ranking-data --continent -cDE,US"
+        if [ -x /usr/bin/create-ml ] ; then
+            if [ -z "$WELCOME_CREATE_ML_OPTIONS" ] ; then
+                WELCOME_CREATE_ML_OPTIONS="--save"
             fi
             tabcontents+=(
-                --field=" $(ltr after_install_um) (Arch, rami)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RunInTerminal '/bin/rami $WELCOME_RAMI_OPTIONS'"
+                --field=" $(ltr after_install_um) (Arch, create-ml)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RunInTerminal 'create-ml $WELCOME_CREATE_ML_OPTIONS'"
             )
-            # AddField2 "" "$(ltr after_install_um) (Arch, rami)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RunInTerminal '/bin/rami $WELCOME_RAMI_OPTIONS'"
         fi
+        # if [ -x /usr/bin/rami ] ; then
+        #     if [ -z "$WELCOME_RAMI_OPTIONS" ] ; then
+        #         WELCOME_RAMI_OPTIONS="--save --timeout-rank 10 --ranking-data --continent -cDE,US"
+        #     fi
+        #     tabcontents+=(
+        #         --field=" $(ltr after_install_um) (Arch, rami)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RunInTerminal '/bin/rami $WELCOME_RAMI_OPTIONS'"
+        #     )
+        #     # AddField2 "" "$(ltr after_install_um) (Arch, rami)!$ICO_MIRROR_RANK!$(ltr after_install_umartip)":fbtn "RunInTerminal '/bin/rami $WELCOME_RAMI_OPTIONS'"
+        # fi
     fi
     if [ -x /usr/bin/eos-rankmirrors ] ; then
         tabcontents+=(
