@@ -49,7 +49,8 @@ export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
 export EOS_KEEP_PKGS
-export PROG_VERSION="$(expac -Q %v $PROG_PACKAGENAME)"
+PROG_VERSION="$(expac -Q %v $PROG_PACKAGENAME)"
+export PROG_VERSION
 export INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
 
 
@@ -1859,10 +1860,11 @@ StartHere() {
 
     local error_log=/tmp/$PROGNAME.log
     local comment=""
+    local result=0
 
     "${notebook[@]}" 2>/dev/null
 
-    local result=$?
+    result=$?
 
     case "$result" in
         5) WelcomeSettings disable ;;
