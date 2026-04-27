@@ -1541,6 +1541,7 @@ _MirrorlistCheck() {
     if [ ! -e "$filename" ] ; then
         local msg="File '$filename' was not found."
         local title="System problem"
+        echo "$PROGNAME: error: $msg" >&2
         echo "$msg" | eos_yad_problem "$title" --text="<b>$PROGNAME</b> detected a system problem!" --height=200 --width=300
         exit 1
     fi
@@ -1549,7 +1550,6 @@ _MirrorlistCheck() {
 StartHere() {
     AssignIconVariables
     _MirrorlistCheck
-    eos_assert_deps $PROGNAME yad || return 1
     DebugBreak
 
     local -r LOPTS="changelog,lang:,tr-engine:,tr-prefer:,id:,ni:,verboselog,genlang:,help,enable,disable,once,startdelay:,version,testing,installer"
@@ -1595,7 +1595,6 @@ StartHere() {
         _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
         AfterTranslations
     fi
-
 
     if eos-connection-checker ; then
         has_a_connection=yes
