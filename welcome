@@ -1536,7 +1536,19 @@ HandleOptions2() {
     [ "$1" ] && DIE "unsupported parameter '$1'"
 }
 
+_MirrorlistCheck() {
+    local filename="/etc/pacman.d/mirrorlist"
+    if [ ! -e "$filename" ] ; then
+        local msg="File '$filename' was not found."
+        local title="System problem"
+        echo "$msg" | eos_yad_problem "$title" --text="<b>$PROGNAME</b> detected a system problem!" --height=200 --width=300
+        exit 1
+    fi
+}
+
 StartHere() {
+    AssignIconVariables
+    _MirrorlistCheck
     eos_assert_deps $PROGNAME yad || return 1
     DebugBreak
 
@@ -1567,7 +1579,6 @@ StartHere() {
     IncludesOption --verboselog "$@" && export WELCOME_VERBOSE_LOG=yes
 
     GetCurrentDesktop CurrentDesktop
-    AssignIconVariables
 
     export show_installer=no    # explicitly show the installer, for testing only
 
