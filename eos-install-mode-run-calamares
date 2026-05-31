@@ -14,7 +14,7 @@ GUIDIE() {
 
     # show the error in a yad window
     local cmd=(
-        $prog --form --title="Error detected"
+        "$prog" --form --title="Error detected"
         --text="<b>$progname:</b>\n$1\n"
         --image=dialog-error
         --button=yad-quit:1
@@ -32,7 +32,7 @@ FollowFile() {
     local ypos="$4"
 
     case "$CurrentDesktop" in
-        xfce) xfce4-terminal -T "$term_title" --geometry=120x20+$xpos+$ypos -x tail -f "$tailfile" & ;;
+        xfce) xfce4-terminal -T "$term_title" --geometry="120x20+$xpos+$ypos" -x tail -f "$tailfile" & ;;
         kde) setsid konsole -e tail -f "$tailfile" &> /dev/null ;;
     esac
 }
@@ -58,7 +58,8 @@ CatchChrootedPacmanLog() {
 
 inxi_output() {
     if [ -x /usr/bin/inxi ] ; then
-        local inxiout="$(inxi -Czc0 ; inxi -Gnmzac0)"
+        local inxiout
+        inxiout="$(inxi -Czc0 ; inxi -Gnmzac0)"
         cat <<EOF >> $log
 ########## inxi:
 $inxiout
@@ -68,8 +69,9 @@ EOF
 
 os-prober_output() {
     if [ -x /usr/bin/os-prober ] ; then
-        local os_prober_out="$(sudo os-prober)"
-        cat <<EOF >> $log
+        local os_prober_out
+        os_prober_out="$(sudo os-prober)"
+        cat <<EOF >> "$log"
 ########## os-prober:
 $os_prober_out
 EOF
@@ -77,8 +79,9 @@ EOF
 }
 
 LogHeader() {
-    local calamares_version="$(pacman -Q calamares 2>/dev/null | awk '{print $NF}')"
-    local date=$(date -u "+%x %X")
+    local calamares_version date
+    calamares_version="$(pacman -Q calamares 2>/dev/null | awk '{print $NF}')"
+    date=$(date -u "+%x %X")
 
     cat <<EOF > $log
 ########## $log by $progname
@@ -92,7 +95,8 @@ EOF
 }
 
 PreliminaryLogFile() {
-    local preprelogfile="$(eos-select-file-server --logfilename)"
+    local preprelogfile
+    preprelogfile="$(eos-select-file-server --logfilename)"
     local output=""
 
     if [ -r "$preprelogfile" ] ; then
@@ -147,14 +151,15 @@ AskMode() {
         kde)  desktopname="KDE" ;;
     esac
 
-    local offline_tip="$(ltr cal_info2 $desktopname) $(ltr cal_info5)"
     local online_tip=""
+    local offline_tip
+    offline_tip="$(ltr cal_info2 $desktopname) $(ltr cal_info5)"
 
     local cmd=(
             eos_yad --form
             --title="$(ltr cal_choose)"
             --text="$(ltr cal_choose)"
-            --image=$ICO_CALAMARES
+            --image="$ICO_CALAMARES"
             --columns=2 --borders=10 --homogeneous
             --height=180 --width=600 --scroll
             --buttons-layout=spread
@@ -186,12 +191,13 @@ AskMode() {
         13) mode=offline ;;
         252|*) exit $ret ;;  # 252 = close using the "corner X"
     esac
+    [ "$result" ] && result=""    # this line only for shellcheck!
 }
 
 PleaseWait() {
     case "$1" in
         start)
-            eos_yad --form --width=250 --title="$(ltr ins_start_calamares)" --text="$(ltr ins_please_wait)" --image=$ICO_CALAMARES --no-buttons &
+            eos_yad --form --width=250 --title="$(ltr ins_start_calamares)" --text="$(ltr ins_please_wait)" --image="$ICO_CALAMARES" --no-buttons &
             sleep 1
             waitpid=$(ps -ef | grep -wv grep | grep "\--no-buttons" | awk '{print $2}')
             ;;
@@ -200,7 +206,7 @@ PleaseWait() {
                 sleep 1
             done
             sleep 1
-            sudo kill $waitpid
+            sudo kill "$waitpid"
             ;;
     esac
 }
@@ -230,47 +236,52 @@ InstallWithLogs() {
 
 hotfix_start_files() {
     local -r file=${HOTFIX_START_FILE##*/}   # file=hotfix-start.bash
-    local -r url=$(eos-github2gitlab $HOTFIX_START_FILE)
+    local -r url=$(eos-github2gitlab "$HOTFIX_START_FILE")
 
     if [ -z "$url" ] ; then
-        PreLog "$FUNCNAME: fetching $file failed!"
+        PreLog "${FUNCNAME[0]}: fetching $file failed!"
         return 1
     fi
 
     if Wget2Curl --timeout=30 -q -O "$workdir/$file" "$url" ; then
-        sudo bash "$workdir/$file" >> "$prelogfile"
+        sudo bash "$workdir/$file" | tee -a  "$prelogfile" > /dev/null
         PreLog "Hotfixes definition file from $url executed."
         return 0
     else
-        PreLog "$FUNCNAME: fetching $url failed!"
+        PreLog "${FUNCNAME[0]}: fetching $url failed!"
         return 1
     fi
 }
+
+DirHasFiles() { [ "$(/bin/ls "$1")" ]; }
+
 hotfix_start_pkg() {
     local -r pkg=eos-iso-hotfix
     if sudo pacman -Sy --noconfirm $pkg &>/dev/null ; then
         # NEW system for hotfixes, uses files in package $pkg.
-        [ -e /usr/share/endeavouros/hotfix/modules/* ] && sudo cp /usr/share/endeavouros/hotfix/modules/* /etc/calamares/modules/
-        [ -e /usr/share/endeavouros/hotfix/scripts/* ] && sudo cp /usr/share/endeavouros/hotfix/scripts/* /etc/calamares/scripts/
+        DirHasFiles /usr/share/endeavouros/hotfix/modules && sudo cp /usr/share/endeavouros/hotfix/modules/* /etc/calamares/modules/
+        DirHasFiles /usr/share/endeavouros/hotfix/scripts && sudo cp /usr/share/endeavouros/hotfix/scripts/* /etc/calamares/scripts/
 
         sudo bash /usr/share/endeavouros/hotfix/hotfixes/hotfix-start.bash
 
         # Note: calamares must copy some hotfix files (e.g. hotfix-end.bash) to folder /tmp of the chrooted target!
 
-        local version=$(expac %v $pkg)
+        local version
+        version=$(expac %v $pkg)
         PreLog "File hotfix-start.bash from package $pkg $version executed."
         return 0
     else
-        PreLog "$FUNCNAME: installing package $pkg failed."
+        PreLog "${FUNCNAME[0]}: installing package $pkg failed."
         return 1
     fi
 }
 run_hotfix_start() { hotfix_start_files || hotfix_start_pkg; }
 
 BootloaderId() {
-    local blid="endeavouros-$(shuf -i 1000-9999 -n1)"
+    local blid
+    blid="endeavouros-$(shuf -i 1000-9999 -n1)"
     PreLog "New bootloader id: '$blid'"
-    sudo sed -i $cfolder/modules/bootloader.conf -e "s|^efiBootloaderId:.*|efiBootloaderId: \"$blid\"|"
+    sudo sed -i "$cfolder"/modules/bootloader.conf -e "s|^efiBootloaderId:.*|efiBootloaderId: \"$blid\"|"
 }
 
 PreLog() {
@@ -282,42 +293,31 @@ CheckUserPkglist() {
     local userlistfile="$Home/user_pkglist.txt"
 
     if [ -r "$userlistfile" ] ; then
-        # Remove comments (sed), empty lines (grep), and trim lines from spaces (sed):
-        local user_pkgs=$(cat "$userlistfile" | sed 's|\([^#]*\)#.*|\1|' | grep -Pv "^[ \t]*$" | sed -e 's|^[ \t]*||' -e 's|[ \t]*$||')
-        local up up2
-        local failed=()
+        local up
+        local not_found=()
         local aur=()
-        local has_spaces=no
         local txt=""
+        local user_pkgs=""
 
-        # allow only one pkgname per line
-        readarray -t user_pkgs < <(echo "$user_pkgs")
+        user_pkgs="$(cat "$userlistfile" | sed -E 's|([^#]*)#.*|\1|')"          # remove comments (line tail after #)
 
-        for up in "${user_pkgs[@]}" ; do
-            [ -n "$up" ] || continue
+        for up in $user_pkgs ; do
             if ! pacman -Si "$up" >& /dev/null ; then
-                if [ "$up" != "$(echo "$up" | sed 's|[ \t]||g')" ] ; then
-                    has_spaces=yes
-                fi
-                up2="\t'$up'"
                 if yay -Sia "$up" >& /dev/null ; then
-                    aur+=("$up2")
+                    aur+=("\t'$up'")
                 else
-                    failed+=("$up2")
+                    not_found+=("\t'$up'")
                 fi
             fi
         done
 
-        if [ -n "$failed" ] ; then
-            txt+="The following package names listed in <b>$userlistfile</b> do not exist:\n$(printf "<tt>%s</tt>\n" "${failed[@]}")\n\n"
+        if [ "${not_found[0]}" ] ; then
+            txt+="The following package names listed in <b>$userlistfile</b> do not exist:\n$(printf "<tt>%s</tt>\n" "${not_found[@]}")\n\n"
         fi
-        if [ -n "$aur" ] ; then
+        if [ "${aur[0]}" ] ; then
             txt+="AUR packages listed in <b>$userlistfile</b> are not supported:\n$(printf "<tt>%s</tt>\n" "${aur[@]}")\n\n"
         fi
-        if [ "$has_spaces" = "yes" ] ; then
-            txt+="Note that only one package name per line is allowed and a package name cannot include white space characters.\n"
-        fi
-        if [ -n "$txt" ] ; then
+        if [ "$txt" ] ; then
             GUIDIE "$txt"
         fi
     fi
@@ -345,7 +345,7 @@ Main() {
     esac
 
     for src_file in "${src_files[@]}" ; do
-        source $src_file || GUIDIE "file <tt>$src_file</tt> not found?"
+        source "$src_file" || GUIDIE "file <tt>$src_file</tt> not found?"
     done
     export -f eos_yad
 
@@ -384,7 +384,7 @@ Main() {
 
     # BootloaderId
 
-    _init_translations $lang || GUIDIE "language init failed"
+    _init_translations "$lang" || GUIDIE "language init failed"
 
     case "$mode" in
         "" | test) AskMode ;;    # ask the value for $mode
@@ -399,7 +399,7 @@ Main() {
     case "$mode" in
         online | offline)
             if [ $testing = no ] ; then
-                sudo cp $cfolder/settings_$mode.conf $cfolder/settings.conf      # copy the settings based on install mode
+                sudo cp "$cfolder/settings_$mode.conf" "$cfolder/settings.conf"      # copy the settings based on install mode
                 PreLog "File settings.conf updated."
             fi
 
@@ -409,17 +409,17 @@ Main() {
             #  - the new (user-commands-before.bash)
             # and they have slightly different parameters.
 
-            local cmd=""
+            local cmd2=""
             local -r iso_version="$(GetIsoVersion)"
-            case "$iso_version)" in
+            case $iso_version in
                 "" | 202[1-3]*) GUIDIE "ISO version '$iso_version' not supported!" ;;
-                2024.01.*)      cmd="$Home/user_commands.bash --iso-config $mode" ;;      # galileo neo
-                *)              cmd="$Home/user-commands-before.bash $mode" ;;            # gemini or later
+                2024.01.*)      cmd2="$Home/user_commands.bash --iso-config $mode" ;;      # galileo neo
+                *)              cmd2="$Home/user-commands-before.bash $mode" ;;            # gemini or later
             esac
 
             if [ $testing = no ] ; then
-                PreLog "Running user defined commands: $cmd"
-                sudo bash $cmd
+                PreLog "Running user defined commands: $cmd2"
+                sudo bash "$cmd2"
             fi
             ;;
         *)
