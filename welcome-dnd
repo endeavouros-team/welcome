@@ -68,7 +68,7 @@ DndDesktopFile() {
     local generic_name="$(grep "^GenericName=" "$file" | head -n 1 | cut -d '=' -f 2)"
     local comment="$(grep "^Comment=" "$file" | head -n 1 | cut -d '=' -f 2)"
     local description="Description not available."
-    local command="xdg-open '$file'"
+    local command="dex '$file'"
 
     if [ -n "$generic_name" ] ; then
         description="$generic_name"
