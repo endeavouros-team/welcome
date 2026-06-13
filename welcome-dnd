@@ -28,7 +28,23 @@ EOF
     fi
 }
 
+DndPut() {
+    local str="$1"
+    local done="$2"                           # if yes then stop
+    local item="personal_commands_add"
+    [ "$done" ] && done="" || done="\\"
+    case "${FUNCNAME[1]}" in
+        DndPutNext)  item="${item//?/ }" ;;
+        DndPutFirst) printf "\n" >> "$configfile"  ;;
+    esac
+    printf "%s \"%s\"" "$item" "$str"     >> "$configfile"
+    printf "%s\n" "$done"                 >> "$configfile"
+}
+DndPutFirst() { DndPut "$1" "$2"; }
+DndPutNext()  { DndPut "$1" "$2"; }
+
 DndAddField() {
+    local needed_app="$1"    # optional; usually some part of $command
     local configfile="$HOME/.config/welcome-own-cmds.conf"
     local mode=""
 
@@ -50,13 +66,15 @@ DndAddField() {
             ;;
         *)
             # new or empty
-            cat <<EOF >> "$configfile"
-
-personal_commands_add "$command" \\
-                      "$name" \\
-                      "$icon" \\
-                      "$description"
-EOF
+            DndPutFirst "$command"
+            DndPutNext  "$name"
+            DndPutNext  "$icon"
+            if [ "$needed_app" ] ; then
+                DndPutNext  "$description"
+                DndPutNext  "$needed_app" yes
+            else
+                DndPutNext  "$description" yes
+            fi
             ;;
     esac
 }
@@ -76,7 +94,7 @@ DndDesktopFile() {
         description="$comment"
     fi
 
-    DndAddField
+    DndAddField "dex"
 }
 
 DndDocumentFile() {

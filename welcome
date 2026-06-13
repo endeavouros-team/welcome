@@ -838,15 +838,16 @@ personal_commands_add() {   # add one personal command
     local icon="$3"
     local description="$4"
     local cmd="$5"
+    local -r errlog=/tmp/welcome-personal-commands.log
 
     [ -n "$description" ] || description="$commandline"
     [ -n "$cmd" ] || cmd="$(echo "$commandline" | /usr/bin/awk '{print $1}')"
 
-    if (/usr/bin/which $cmd &> /dev/null) ; then
+    if /usr/bin/which $cmd &> /dev/null ; then
         welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$commandline")
     else
-        printf "%s: %s\n    %s\n" "$(/usr/bin/date "+%x %X")" "$FUNCNAME:" "warning: command '$cmd' not found" >> /tmp/welcome-personal-commands.log
-        echo "$FUNCNAME: warning: command '$cmd' not found" >&2
+        printf "%s: %s\n    %s\n" "$(/usr/bin/date "+%x %X")" "$FUNCNAME:" "warning: command '$cmd' not found" >> $errlog
+        echo "$FUNCNAME: warning: command '$cmd' not found. See also: $errlog" >&2
     fi
 }
 
