@@ -7,6 +7,7 @@ Comment[fi]=EndeavourOS:n Welcome-ohjelman käynnistin
 Comment[sk]=Spúšťač privítania v systéme EndeavourOS
 Exec=eos-welcome
 Icon=endeavouros-icon
+StartupWMClass=yad
 # StartupNotify=false
 # Terminal=False
 Hidden=false
