@@ -22,7 +22,7 @@ fi
 WELCOME_TIP_PAGES+=(
     "$(ltr after_install_ft)|$(ltr after_install_fttip)|'$EOS_INCLUDE_LOGS_PAGE'"                       # Forum tips
     "EndeavourOS $_and ARM|EndeavourOS $_and ARM $(ltr after_install_info)|'$ARM_MAIN_PAGE'"
-    "$(ltr arch_chroot)|$(ltr arch_chroot_tip)|'https://discovery.endeavouros.com/system-rescue/arch-chroot'"
+    "$(ltr arch_chroot)|$(ltr arch_chroot_tip)|'$ARCH_CHROOT_PAGE'"
 
     "$(ltr after_install_reisub)|$(ltr after_install_reisubtip)|'$REISUB_PAGE'"
     "$(ltr after_install_reisub2)|$(ltr after_install_reisubtip)|eos-reisub --enable|$ICO_CUSTOM"

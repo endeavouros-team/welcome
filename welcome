@@ -417,7 +417,7 @@ GeneralInfo() {
       --field=" $(ltr general_info_ne)!$ICO_TIPS!$(ltr general_info_netip)":fbtn        "WelcomeBrowser $EOS_NEWS_PAGE"
       --field=" $(ltr general_info_fo)!$ICO_TIPS!$(ltr general_info_fotip)":fbtn        "WelcomeBrowser $EOS_FORUM_PAGE"
       --field=" $(ltr general_info_do)!$ICO_TIPS!$(ltr general_info_dotip)":fbtn        "WelcomeBrowser $EOS_DONATE_PAGE"
-      --field=" $(ltr general_info_ab)!$ICO_TIPS!$(ltr general_info_abtip)":fbtn        "WelcomeBrowser $EOS_WELCOME_PAGE"
+      # --field=" $(ltr general_info_ab)!$ICO_TIPS!$(ltr general_info_abtip)":fbtn        "WelcomeBrowser $EOS_WELCOME_PAGE"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
