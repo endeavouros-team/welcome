@@ -12,9 +12,9 @@ WELCOME_TIP_PAGES+=(
     "$(ltr after_install_bt)|$(ltr after_install_bttip)|'$BLUETOOTH_INFO_PAGE'"
 )
 
-if [ -x /usr/bin/firewalld ] ; then
+# if [ -x /usr/bin/firewalld ] ; then
     WELCOME_TIP_PAGES+=( "$(ltr after_install_fw)|$(ltr after_install_fwtip)|'$EOS_FIREWALLD_INFO_PAGE'" )
-fi
+# fi
 if [ "$(eos_GetArch)" != "armv7h" ] ; then
     WELCOME_TIP_PAGES+=("$(ltr after_install_nv)|$(ltr after_install_nvtip)|'$EOS_NVIDIA_INFO_PAGE'")
 fi
