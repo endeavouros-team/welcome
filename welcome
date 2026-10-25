@@ -696,9 +696,6 @@ WelcomeInitialTab() {
     ##        or the first parameter in call to personal_commands_init()
     ##        in file ~/.config/welcome-own-cmds.conf.
 
-    if [ ! -r "$welcome_configurator" ] ; then
-        echo "EOS_WELCOME_ACTIVE_TAB_NUMBER=2  # default: 2 (=After Install)" > "$welcome_configurator"
-    fi
     # shellcheck disable=1090
     source "$welcome_configurator"
     [ -z "$EOS_WELCOME_ACTIVE_TAB_NUMBER" ] && export EOS_WELCOME_ACTIVE_TAB_NUMBER=2
@@ -1584,6 +1581,16 @@ _MirrorlistCheck() {
     fi
 }
 
+FirstRunDelay() {
+    local -r welcome_first_run_file="$HOME/.config/welcome-first-run-done"
+    if [ -e "$welcome_first_run_file" ] ; then
+        return
+    else
+        touch "$welcome_first_run_file"
+        sleep 3
+    fi
+}
+
 StartHere() {
     AssignIconVariables
     _MirrorlistCheck
@@ -1741,17 +1748,26 @@ StartHere() {
     local -r WELCOME_CONFIG2="\$HOME/.config/EOS-greeter.conf"
     export welcome_configurator="$HOME/.config/welcome.conf"      # another welcome config... should combine these
 
-    if [ -r "$welcome_configurator" ] ; then
-        if grep -q "^local ConfVersion" "$welcome_configurator" || grep -q "^local MaxButtonNameLength" "$welcome_configurator" ; then
-            # this is an old config file, just delete the file
-            rm -f "$welcome_configurator"
+    if false ; then
+        if [ -r "$welcome_configurator" ] ; then
+            if grep -q "^local ConfVersion" "$welcome_configurator" || grep -q "^local MaxButtonNameLength" "$welcome_configurator" ; then
+                # this is an old config file, just delete the file
+                rm -f "$welcome_configurator"
+            fi
         fi
     fi
 
-    # shellcheck disable=1090
-    [ -r "$welcome_configurator" ] && source "$welcome_configurator"
+    if [ ! -e "$welcome_configurator" ] ; then
+        echo "# The number of the active tab when starting Welcome.
+EOS_WELCOME_ACTIVE_TAB_NUMBER=2  # default: 2 (=After Install)
 
-    [ "$EOS_WELCOME_ACTIVE_TAB_NUMBER" ] || EOS_WELCOME_ACTIVE_TAB_NUMBER=2
+# Number of seconds to delay Welcome at start.
+# Typical values: from 0 to 5
+# Default: 1
+EOS_WELCOME_START_DELAY=1" > "$welcome_configurator"
+    fi
+    # shellcheck disable=1090
+    source "$welcome_configurator"
 
     export EOS_WELCOME_ACTIVE_TAB_NUMBER
 
@@ -1759,6 +1775,9 @@ StartHere() {
     local start_delay=0
     local auto_started=no
     local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$PROG_VERSION"        # main window title
+
+    [ "$EOS_WELCOME_START_DELAY" ] && start_delay="$EOS_WELCOME_START_DELAY"
+    FirstRunDelay         # delay the first run
 
     case "$auto_started" in
         yes) ;;    # started by the autostart .desktop (?)
