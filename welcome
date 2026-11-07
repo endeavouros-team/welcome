@@ -359,11 +359,15 @@ INSTALL() {
       --image="$ICO_CALAMARES"                       # $WELCOME_ICON_INSTALL_TAB
       --text="$text"
       --text-align=left
-
-      --field=" $(ltr ins_start)!$ICO_CALAMARES!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' '$install_mode'"
+  )
+  tabcontents+=(
+      --field=" $(ltr ins_start)!$ICO_CALAMARES!$(ltr ins_starttip)":fbtn  "eos-install-mode-run-calamares '$lang' '$install_mode'"
       # --field=" $(ltr install_community)!$ICO_INSTALL!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
       # --field=" $(ltr ins_arm_start)!$ICO_INSTALL_ARM!$(ltr ins_arm_starttip)":fbtn    "arm-eos-welcome-installer"
   )
+  case "$XDG_CURRENT_DESKTOP" in
+      KDE) tabcontents+=(--field=" $(ltr ins_kbd_layout)!$ICO_KEYBOARD!$(ltr ins_kbd_layouttip)":fbtn  "kcmshell6 kcm_keyboard") ;;
+  esac
   [ "$has_a_connection" = "yes" ] && MirrorRankingButtons
 
   IsInstalled partitionmanager && tabcontents+=(--field=" $(ltr ins_pm) (partitionmanager)!$ICO_PARTITIONMANAGER!$(ltr ins_pmtip2)":fbtn 'partitionmanager')
@@ -1417,6 +1421,7 @@ AssignIconVariables() {
     export ICO_THEME=$(eos_icon_path apps preferences-desktop-theme)
     export ICO_ENABLE=$(eos_icon_path apps system-run)
     export ICO_OWN_COMMANDS=$(eos_icon_path apps applications-featured)
+    export ICO_KEYBOARD=$(eos_icon_path apps fcitx-kbd)
 
     export ICO_SAD=$ICO_EXIT
     #export ICO_ANGEL=face-angel
